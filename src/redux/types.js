@@ -1,0 +1,2 @@
+export const GET_ANIMAL_LIST = 'GET_ANIMAL_LIST'
+export const LOAD_COMPANY = 'LOAD_COMPANY'

@@ -1,0 +1,314 @@
+html body {
+	height: 100%;
+	background-color: #FFFFFF;
+	direction: ltr;
+}
+
+.main-menu.menu-light {
+	background: #FFFFFF;
+	border: #FFFFFF;
+}
+
+.main-menu.menu-light .navigation {
+	background: #FFFFFF;
+}
+
+.main-menu .navbar-header .navbar-brand .brand-logo img {
+  width: 40px;
+}
+
+.table thead {
+	text-transform: capitalize;
+}
+
+.breadcrumb {
+	background-color: #FFFFFF;
+}
+
+.invoice-view-wrapper .card {
+	box-shadow: none;
+}
+
+.invoice-view-wrapper .invoice-action-wrapper {
+	background-color: #FFFFFF;
+}
+
+.invoice-edit-wrapper .card {
+	box-shadow: none;
+}
+
+.invoice-edit-wrapper .invoice-action-wrapper {
+	background-color: #FFFFFF;
+}
+
+.invoice-footer {
+	display: flex;
+}
+
+.invoice-item-delete {
+	color: #e80000;
+}
+
+.sidebar-overlay {
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	position: fixed;
+	z-index: 1032;
+	visibility: hidden;
+	opacity: 0;
+	border-radius: 0.267rem;
+  }
+
+.sidebar-overlay.show {
+	visibility: visible;
+	transition: all 0.3s ease;
+	opacity: 1;
+	z-index: 1032;
+	background-color: rgba(0, 0, 0, 0.2);
+  }
+
+.lma-list .sidebar {
+	height: 100%; /* 100% Full-height */
+	width: 25%; /* 0 width - change this with JavaScript */
+	position: fixed; /* Stay in place */
+	z-index: 10; /* Stay on top */
+	top: 0; /* Stay at the top */
+	right: 0;
+	background-color: #FFFFFF;
+	overflow-x: hidden; /* Disable horizontal scroll */
+	transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+}
+
+.lma-list .sidebar {
+	z-index: 1033;
+}
+
+/* .lma-list .sidebar .card-footer {
+	bottom: 0;
+	position: absolute;
+} */
+
+.sidebar .card {
+	height: 100%;
+}
+
+.lma-list .sidebar.card .card {
+	margin: 0 auto;
+	width: 16rem;
+	box-shadow: -8px 12px 18px 0 rgba(25, 42, 70, 0.13) !important;
+	background-color: #D8D8D8;
+}
+
+.lma-list .sidebar.card .card .card-content{
+	height: 9rem;
+}
+
+.lma-list .sidebar.card .card .bx {
+	font-size: 2.2rem;
+	font-weight: bold;
+	color: #5A8DEE;
+}
+
+.lma-list .sidebar.card .card .avatar {
+	height: 6rem;
+	width: 6rem;
+	position: absolute;
+	top: 70%;
+	left: 0;
+	right: 0;
+	margin: auto;
+	border: 6px solid white;
+	border-radius: 50%;
+	box-shadow: -8px 12px 18px 0 rgba(25, 42, 70, 0.13);
+	background-color: #D8D8D8;
+}
+
+.lma-list .nav-sidebar-link {
+	color: #475F7B;
+}
+
+.lma-list .nav-sidebar-link.active {
+	color: #5A8DEE;
+}
+
+.csv-btn a {
+	border: 1px solid #5A8DEE !important;
+	color: #5A8DEE;
+}
+
+.animal-details-wrapper .animal-detail-profile .card {
+	margin-bottom: 9rem;
+}
+
+.animal-details-wrapper .animal-detail-profile .card .card-content .avatar-container{
+	margin-bottom: 9rem;
+}
+
+.animal-details-wrapper .animal-detail-profile .card .card-content .avatar {
+	position: absolute;
+	top: 70%;
+	left: 0;
+	right: 0;
+	margin: auto;
+	border: 10px solid white;
+	border-radius: 50%;
+	box-shadow: -8px 12px 18px 0 rgba(25, 42, 70, 0.13);
+}
+
+.animal-details-wrapper .animal-detail-profile .card .card-img-top {
+	border-radius: calc(0.5rem - 0px);
+}
+
+.animal-details-wrapper .animal-detail-info .nav-tabs {
+	border-bottom: none;
+}
+
+.animal-details-wrapper .animal-detail-info .nav-tabs .nav-link {
+	background-color: inherit;
+	color: #5A8DEE;
+	border: 1px solid #5A8DEE !important;
+}
+
+.animal-details-wrapper .animal-detail-info .nav-tabs .nav-link.active {
+	background-color: #5A8DEE;
+	color: #FFFFFF;
+}
+
+.lma-list .content-wrapper .content-body .sidebar.card .assigned .date-picker .pickadate {
+	border-color: transparent;
+}
+
+.lma-list .content-wrapper .content-body .sidebar.card .assigned .date-picker .pickadate:hover {
+	border-color: #DFE3E7;
+}
+
+.lma-list .content-wrapper .content-body .sidebar.card .assigned .date-picker .pickadate:focus {
+	border-color: #DFE3E7;
+	box-shadow: none;
+}
+
+html body .content.app-content .content-area-wrapper .content-wrapper {
+	height: 100%;
+	overflow: scroll;
+}
+
+.todo-application .content-area-wrapper .sidebar .todo-sidebar {
+	height: 100%;
+}
+
+.todo-application .content-area-wrapper .todo-new-task-sidebar {
+	top: 0;
+}
+
+.login .app-content .content-body .card {
+	height: 100%;
+	width: 100%;
+}
+
+.login .app-content .content-body .card .row{
+	height: 100%;
+}
+
+.signup .card .card-img {
+	height: 300px;
+}
+
+.signup .swiper-button-next, .swiper-button-prev {
+	color: #5A8DEE;
+}
+
+.signup .swiper-centered-slides-2.swiper-container .swiper-slide .list-group-item{
+	background-color: transparent;
+	border: none;
+}
+
+.signup .swiper-centered-slides-2.swiper-container .swiper-slide .card{
+	background-color: transparent;
+}
+
+.signup .swiper-centered-slides-2.swiper-container .swiper-slide.swiper-slide-active .swiper-text {
+	color: #FFFFFF;
+}
+
+.signup .swiper-centered-slides-2.swiper-container .swiper-slide.swiper-slide-active .swiper-text {
+	color: #FFFFFF;
+}
+
+.signup .cart .card {
+	box-shadow: -8px 12px 18px 0 rgba(25, 42, 70, 0.13) !important;
+}
+
+body.vertical-layout.vertical-menu-modern.signup .main-menu {
+	border-right: none;
+}
+
+table.dataTable.dtr-column > tbody > tr > td.control:before, table.dataTable.dtr-column > tbody > tr > th.control:before {
+    top: 50%;
+    left: 50%;
+    height: 16px;
+    width: 16px;
+    margin-top: -5px;
+    margin-left: -10px;
+    display: block;
+    position: absolute;
+    color: #5A8DEE;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    box-sizing: content-box;
+    text-align: center;
+    text-indent: 0 !important;
+    font-family: boxicons !important;
+    line-height: 14px;
+    content: "\eb12";
+    background-color: transparent;
+}
+
+table.dataTable.dtr-column > tbody > tr.parent td.control:before, table.dataTable.dtr-column > tbody > tr.parent th.control:before {
+	content: "\eaf0";
+	color: #d33333;
+	background-color: transparent;
+}
+
+table.dataTable>tbody>tr.child ul.dtr-details {
+	display: list-item;
+}
+
+table.dataTable>tbody>tr.child ul.dtr-details>li {
+	display: flex;
+	justify-content: space-between;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    input[type='checkbox']:checked {
+		border: none;
+	}
+	
+	input[type='checkbox']:not(:checked) {
+		border: none;
+	}
+}
+
+@media (max-width: 1200px)
+{
+	.lma-list .sidebar {
+		width: 65%; /* 0 width - change this with JavaScript */
+	}
+}
+
+@media (max-width: 600px)
+{
+	.invoice-footer {
+		display: block;
+	}
+
+	.sidebar {
+		width: 100%;
+	}
+
+	.lma-list .sidebar {
+		width: 85%; /* 0 width - change this with JavaScript */
+	}
+}
