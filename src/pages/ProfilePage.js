@@ -17,19 +17,23 @@ export const ProfilePage = () => {
         },
         {
             title: 'Company',
-            icon: 'bx bxs-group mr-25'
+            icon: 'bx bxs-group mr-25',
+            adminOnly: true
         },
         {
             title: 'Manage Users',
-            icon: 'bx bxs-group mr-25'
+            icon: 'bx bxs-group mr-25',
+            adminOnly: true
         },
         {
             title: 'Billing',
-            icon: 'bx bxs-group mr-25'
+            icon: 'bx bxs-group mr-25',
+            adminOnly: true
         },
         {
             title: 'Account',
-            icon: 'bx bxs-group mr-25'
+            icon: 'bx bxs-group mr-25',
+            adminOnly: true
         }
     ]
 
@@ -52,7 +56,7 @@ export const ProfilePage = () => {
             <div className="content-wrapper">
                 <BreadCrumbs />
                 <div className="content-body">
-                    <Tabs tabs={tabs} active={active} setActive={setActive} />
+                    <Tabs tabs={tabs} active={active} setActive={setActive} role='ADMIN' />
                     <div className="tab-content">
                         {page}
                     </div>

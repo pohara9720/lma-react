@@ -9,8 +9,8 @@ export const TableHeaderActions = ({ filters, options }) => {
             <input className="form-control" style={{ width }} type='search' placeholder='Search' />
             {options &&
                 <>
-                    <ActionDropdown options={filters} />
-                    <ActionDropdown options={options} />
+                    {filters && <ActionDropdown options={filters} />}
+                    {options && <ActionDropdown options={options} />}
                 </>
             }
         </div>

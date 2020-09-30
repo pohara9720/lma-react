@@ -12,17 +12,26 @@ import { connect } from 'react-redux'
 import { compose } from 'recompose'
 
 const schema = yup.object().shape({
-
+    category: yup.string().required(),
+    title: yup.string().required(),
+    assigned_date: yup.string().required(),
+    description: yup.string().required(),
+    users: yup.array().of(yup.string()).required(),
+    due_date: yup.string().when('category', { is: c => c === BREEDING, then: s => s.required() }), //ONLY BREEDING
+    cost: yup.number().when('category', { is: c => c !== BREEDING, then: s => s.required() }), //EVERYTHING BUT BREEDING
+    animals: yup.array().of(yup.string()).when('category', { is: c => c !== OTHER, then: s => s.required() }), //EVERYTHING BUT OTHER
 })
 
-export const AddorEditTaskRaw = ({ formValues }) => {
+export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit }) => {
     const { category } = formValues || {}
-    console.log(category)
     const isBreeding = category === BREEDING
     const isOther = category === OTHER
     const userOptions = toMulti(taskCategories)
+    const submit = values => {
+        console.log(values)
+    }
     return (
-        <form id="compose-form" className="mt-1">
+        <form id="compose-form" className="mt-1" onSubmit={handleSubmit(submit)}>
             <div className="card-content">
                 <div className="card-body py-0 border-bottom">
                     <div className='form-group'>
@@ -41,18 +50,19 @@ export const AddorEditTaskRaw = ({ formValues }) => {
                         <div>
                             <Input label='Task Date' type='date' name="assigned_date" id="task-form-assignedOn" placeholder="Task Date" />
                         </div>
-                        <div>
-                            <Input label='Due Date' type='date' name="due_date" id="task-form-dueDate" placeholder="Due Date" />
-                        </div>
+                        {
+                            isBreeding &&
+                            <div>
+                                <Input label='Due Date' type='date' name="due_date" id="task-form-dueDate" placeholder="Due Date" />
+                            </div>
+                        }
                     </div>
                     <div className="form-group">
-                        {/* TODO - NEED MULTISELECT */}
                         <MultiSelect options={userOptions} placeholder='Select Users' name='users' label='Users Assigned To' />
                     </div>
                     {
                         !isOther &&
                         <div className="form-group">
-                            {/* TODO - NEED MULTISELECT */}
                             <MultiSelect options={userOptions} placeholder='Select Animals' name='animals' label='Animals Assigned To' />
                         </div>
                     }
@@ -90,6 +100,21 @@ export const AddorEditTaskRaw = ({ formValues }) => {
                             </div>
                         </li> */}
                     </ul>
+                </div>
+                <div className="card-footer container">
+                    <div className="row">
+                        <div className="col-xs-6">
+                            <button type='submit' className="btn btn-primary invoice-send-btn">
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+                        <div className="col-xs-6">
+                            <button data-action="close" onClick={onClose} className="btn invoice-send-btn">
+                                <span>Cancel</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div className="sidenav-overlay"></div>
                 </div>
             </div>
         </form>

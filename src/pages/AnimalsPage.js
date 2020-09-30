@@ -1,6 +1,7 @@
 import React from 'react'
 import { BreadCrumbs } from '../components/molecules/BreadCrumbs'
 import { useModal } from '../hooks/useModal'
+import { readDate } from '../helpers/index'
 import { PageHeaderActions } from '../components/molecules/PageHeaderActions'
 import { AddorEditAnimal } from '../components/organisms/AddorEditAnimal'
 import { useTable } from '../hooks/useTable'
@@ -20,19 +21,20 @@ const columns = [
         render: (({ name, id }, { match }) => <Link to={`${match.url}/${id}`}>{name}</Link>)
     },
     {
-        label: 'Category',
+        label: 'Tag #',
         name: 'tag_number',
     },
     {
-        label: 'Tag #',
+        label: 'Registration #',
         name: 'registration_number',
     },
     {
-        label: 'Registration #',
-        name: 'dob'
+        label: 'DATE OF BIRTH',
+        name: 'dob',
+        render: (({ dob }) => readDate(dob))
     },
     {
-        label: 'Date of Birth',
+        label: 'Category',
         name: 'type',
         render: (({ type }) => <BulletLabel label={type} />)
     },
@@ -60,8 +62,8 @@ export const AnimalsPageRaw = ({ listAnimals }) => {
                         <TableHeaderActions options={animalOptions} filters={animalFilters} />
                         <Table />
                     </section>
-                    <Modal title='Add Animal' onClose={toggle} onSubmit={() => console.log('implements')}>
-                        <AddorEditAnimal />
+                    <Modal actionless title='Add Animal' onClose={toggle} onSubmit={() => console.log('implements')}>
+                        <AddorEditAnimal onClose={toggle} />
                     </Modal>
                 </div>
             </div>

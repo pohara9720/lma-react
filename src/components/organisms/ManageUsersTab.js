@@ -1,15 +1,23 @@
-import React, { Component, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { PageHeaderActions } from '../molecules/PageHeaderActions'
 import { useTable } from '../../hooks/useTable'
 import { TableHeaderActions } from '../molecules/TableHeaderActions'
-import { animalOptions, animalFilters } from '../../dictionary'
-import { BulletLabel } from '../atoms/BulletLabel'
+import { userOptions } from '../../dictionary'
 import { useModal } from '../../hooks/useModal'
 import { Input } from '../atoms/Input'
 import { reduxForm, FieldArray, Field } from 'redux-form'
-import { validator } from '../../helpers/validator'
-import * as yup from 'yup'
+import { emailFieldArrayValidator as validate } from '../../helpers/validator'
+import { api } from '../../helpers/api'
+import { listUsers } from '../../redux/actions/users'
+import { connect } from 'react-redux'
 import styled from 'styled-components'
+
+const Actions = styled.div`
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    justfiy-content:space-between
+`
 
 const Icon = styled.div`
     border-radius:8px;
@@ -32,37 +40,11 @@ const Container = styled.div`
     margin:16px 0;
 `
 
-const schema = yup.object().shape({
-    emails: yup.array().of(yup.string().email()).required('Valid Email is Required')
-})
-
-const columns = [
-    {
-        label: 'Tag #',
-        name: 'tag'
-    },
-    {
-        label: 'Name',
-        name: 'name',
-        render: (({ id }) => <div>{id}</div>)
-    },
-    {
-        label: 'DOB',
-        name: 'dob'
-    },
-    {
-        label: 'Category',
-        name: 'category',
-        render: (item) => <BulletLabel label={item.category} />
-    },
-
-]
-
 const emails = ({ fields }) => (
     <div>
         {fields.map((email, i) => (
             <Container key={i}>
-                <Input className='special-input' label='Email' name={`${email}.email`} placeholder="Enter Email" />
+                <Input className='special-input' label='Email' name={email} placeholder="Enter Email" />
                 <Icon onClick={() => fields.remove(i)}>
                     <i className='bx bx-trash-alt'></i>
                 </Icon>
@@ -74,16 +56,14 @@ const emails = ({ fields }) => (
     </div>
 )
 
-const ModalContentRaw = ({ initialize, handleSubmit, ...rest }) => {
+const ModalContentRaw = ({ initialize, handleSubmit, onSubmit, ...rest }) => {
+
     useEffect(() => {
         initialize({ emails: [""] })
     }, [])
-    const submit = (values, ...other) => {
-        console.log('STUFF', values, rest, other)
-    }
 
     return (
-        <form onSubmit={handleSubmit(submit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <div className="card-content collapse show" aria-expanded="true">
                 <div className="tab-content mt-1 pl-0">
                     <div className="tab-pane container active" id="details" aria-labelledby="details-tab" role="tabpanel">
@@ -96,23 +76,93 @@ const ModalContentRaw = ({ initialize, handleSubmit, ...rest }) => {
     )
 }
 
-const ModalContent = reduxForm({ form: 'companyUserForm', asyncValidate: validator(schema) })(ModalContentRaw)
+const ModalContent = reduxForm({ form: 'companyUserForm', validate })(ModalContentRaw)
 
-export const ManageUsersTab = () => {
+export const ManageUsersTabRaw = ({ loadUsers, users }) => {
+    const onDelete = async id => {
+        const result = await api.delete(`user/${id}`)
+        const state = users.filter((user) => user.id !== id)
+        loadUsers(state)
+    }
+    const onResendLink = email => {
+        console.log(email)
+    }
+
+    const columns = [
+        {
+            label: 'Email',
+            name: 'email',
+            render: (({ email }) => <a href='#'>{email}</a>)
+        },
+        {
+            label: 'First Name',
+            name: 'first_name',
+        },
+        {
+            label: 'Last Name',
+            name: 'last_name' //NOTE email last name
+        },
+        {
+            label: 'Role',
+            name: 'role'
+        },
+        {
+            label: 'Status',
+            name: 'is_active',
+            render: (({ is_active }) => <div>{is_active ? 'Active' : 'Inactive'}</div>)
+        },
+        {
+            label: 'Actions',
+            name: 'id',
+            render: (({ id, email, is_active }) =>
+                <Actions>
+                    {!is_active && <button className='btn btn-primary' onClick={() => onResendLink(email)}>Resend Invite</button>}
+                    <div style={{ cursor: 'pointer' }} onClick={() => onDelete(id)}>
+                        <i style={{ marginLeft: 8, fontSize: 24 }} className='bx bx-trash-alt'></i>
+                    </div>
+                </Actions>
+            )
+        },
+
+    ]
+
     const { toggle, Modal } = useModal()
-    const { Table } = useTable([], columns)
+    const { Table } = useTable(users, columns)
+
+    useEffect(() => {
+        const fetch = async () => {
+            const { data: init } = await api.get('user') //NOTE - need to change this to users after authentication
+            loadUsers(init)
+        }
+        fetch()
+    }, [])
+
+    const onSubmit = async (values) => {
+        const { data } = await api.post('user/', values)
+        const result = [...users, ...data]
+        loadUsers(result)
+        toggle()
+    }
+
     return (
         <div className="tab-pane fade active show" aria-labelledby="users-tab" role="tabpanel">
             <section className="invoice-list-wrapper">
                 <PageHeaderActions onAdd={toggle} title='Add User' />
-                <TableHeaderActions options={animalOptions} filters={animalFilters} />
+                <TableHeaderActions options={userOptions} />
                 <Table />
             </section>
             <Modal title='Add Users' onClose={toggle} actionless>
-                <ModalContent />
+                <ModalContent onSubmit={onSubmit} />
             </Modal>
         </div>
     )
 }
+
+const mapStateToProps = ({ users }) => ({ users })
+const mapDispatchToProps = dispatch => ({
+    loadUsers: (users) => dispatch(listUsers({ users }))
+})
+
+export const ManageUsersTab = connect(mapStateToProps, mapDispatchToProps)(ManageUsersTabRaw)
 
 

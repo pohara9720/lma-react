@@ -33,7 +33,6 @@ import './app-assets/css/bootstrap.min.css'
 import './app-assets/css/colors.min.css'
 import './app-assets/css/components.min.css'
 import './app-assets/fonts/boxicons/css/boxicons.min.css'
-import 'react-widgets/dist/css/react-widgets.css'
 
 const middlewares = [logger];
 
@@ -49,7 +48,7 @@ const mapDispathToProps = dispatch => ({
 
 const AuthProviderRaw = ({ children, loadCompany, ...rest }) => {
   const { data, loading, error } = useFetch('/company')
-  loadCompany(data)
+  data && loadCompany(data?.results[0])
   return (
     <div>{children}</div>
   )

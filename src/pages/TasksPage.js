@@ -21,8 +21,8 @@ export const TasksPage = () => {
                             <Todos />
                         </div>
                     </section>
-                    <Modal title='New Task' onClose={toggle} onSubmit={() => console.log('implements')}>
-                        <AddorEditTask />
+                    <Modal actionless title='New Task' onClose={toggle} onSubmit={() => console.log('implements')}>
+                        <AddorEditTask onClose={toggle} />
                     </Modal>
                 </div>
             </div>

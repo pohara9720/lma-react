@@ -7,14 +7,14 @@ export const custom = ({
     placeholder,
     id,
     label,
-    meta: { touched, error, ...all },
+    meta: { touched, error },
     className = "form-group",
     ...rest
 }) => {
     return (
         <div className={className}>
             {label && <label htmlFor={id}>{label}</label>}
-            <input {...input} placeholder={placeholder} type={type} id={id} className="form-control" />
+            <input {...input} placeholder={placeholder} type={type} id={id} className="form-control" {...rest} />
             {touched && error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
     );

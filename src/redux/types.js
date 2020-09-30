@@ -1,2 +1,3 @@
 export const GET_ANIMAL_LIST = 'GET_ANIMAL_LIST'
 export const LOAD_COMPANY = 'LOAD_COMPANY'
+export const LOAD_USERS = 'LOAD_USERS'

@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import { Field } from 'redux-form'
 import cow from '../../app-assets/images/slider/cow.jpg'
 
-const Uploader = ({ input, label }) => {
-    const [preview, setPreview] = useState(cow)
+const Uploader = ({ input, label, init }) => {
+    const [preview, setPreview] = useState(init || cow)
     const onInputChange = (e) => {
         e.preventDefault();
         const reader = new FileReader()

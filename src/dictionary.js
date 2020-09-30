@@ -27,6 +27,7 @@ export const OTHER = 'OTHER'
 export const FEED = 'FEED'
 export const HEALTH = 'HEALTH'
 export const REPRODUCTION = 'REPRODUCTION'
+export const ADMIN_ROLE = 'ADMIN'
 
 export const animalFilters = [
     { id: 'ALL_FILTERS', label: 'Filter', onClick: () => console.log('Hello') },
@@ -70,6 +71,12 @@ export const invoiceOptions = [
     { id: 'ALL_OPTIONS', label: 'Options', onClick: () => console.log('Hello') },
     { id: 'SEND', label: 'Assign Tasks', onClick: () => console.log('Hello') },
     { id: 'DELETE', label: 'Delete Inventory', onClick: () => console.log('Hello'), isDelete: true },
+]
+
+export const userOptions = [
+    { id: 'ALL_OPTIONS', label: 'Options', onClick: () => console.log('Hello') },
+    { id: 'SEND', label: 'Assign Task', onClick: () => console.log('Hello') },
+    { id: 'DELETE', label: 'Delete Selected', onClick: () => console.log('Hello'), isDelete: true },
 ]
 
 export const invoiceTypeOptions = [

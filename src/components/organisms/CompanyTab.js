@@ -1,32 +1,33 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Select } from '../atoms/Select'
 import { states } from '../../dictionary'
 import cow from '../../app-assets/images/slider/cow.jpg'
 import { Input } from '../atoms/Input'
 import { reduxForm } from 'redux-form'
 import * as yup from 'yup'
+import { connect } from 'react-redux'
+import { compose } from 'recompose'
 import { validator } from '../../helpers/validator'
+import { FileInput } from '../atoms/FileInput'
 
 const schema = yup.object().shape({
 
 })
 
-export const CompanyTabRaw = () => {
+export const CompanyTabRaw = ({ company, initialize, ...rest }) => {
+
+    const { name, email, address, logo } = company
+    const { street, city, state, zipcode } = address
+
+    useEffect(() => {
+        initialize({ name, email, street, city, state, zipcode })
+    }, [])
+
     return (
         <div className="tab-pane active fade show" id="company" aria-labelledby="company-tab"
             role="tabpanel">
-            <div className="media mb-2">
-                <a className="mr-2" href="#">
-                    <img src={cow} alt="users avatar" className="users-avatar-shadow rounded-circle" height="64" width="64" />
-                </a>
-                <div className="media-body">
-                    <h4 className="media-heading">Logo</h4>
-                    <div className="col-12 px-0 d-flex">
-                        <a href="#" className="btn btn-sm btn-primary mr-25">Change</a>
-                    </div>
-                </div>
-            </div>
-            <div className="row">
+            <FileInput name='logo' label='Logo' init="https://i.ytimg.com/vi/oygrmJFKYZY/maxresdefault.jpg" />
+            <div className="row" style={{ marginTop: 32 }}>
                 <div className="col-md-6">
                     <div className="form-group">
                         <Input label='Name' name="name" id="company-form-name" placeholder="Name" />
@@ -35,7 +36,7 @@ export const CompanyTabRaw = () => {
                         <Input label='Email' name="email" id="company-form-email" placeholder="Email" />
                     </div>
                     <div className="form-group">
-                        <Input label='Address' name="address" id="company-form-address" placeholder="Address" />
+                        <Input label='Street' name="street" id="company-form-address" placeholder="Address" />
                     </div>
                     <div className="form-group">
                         <Input label='City' name="city" id="company-form-city" placeholder="City" />
@@ -55,4 +56,9 @@ export const CompanyTabRaw = () => {
     )
 }
 
-export const CompanyTab = reduxForm({ form: 'companyForm', asyncValidate: validator(schema) })(CompanyTabRaw)
+const mapStateToProps = ({ company }) => ({ company })
+
+export const CompanyTab = compose(
+    connect(mapStateToProps, null),
+    reduxForm({ form: 'companyForm', asyncValidate: validator(schema) })
+)(CompanyTabRaw)

@@ -7,7 +7,14 @@ import { Input } from '../atoms/Input'
 import * as yup from 'yup'
 
 const schema = yup.object().shape({
-
+    category: yup.string().required(),
+    cost: yup.number().required(),
+    tank_number: yup.number().required(),
+    canister_number: yup.number().required(),
+    top_id: yup.string().required(),
+    units: yup.number().required(),
+    father: yup.string().required(),
+    mother: yup.string().required(),
 })
 
 export const AddorEditInventoryRaw = () => {
