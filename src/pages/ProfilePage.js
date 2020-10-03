@@ -6,8 +6,10 @@ import { ManageUsersTab } from '../components/organisms/ManageUsersTab'
 import { CompanyTab } from '../components/organisms/CompanyTab'
 import { AccountTab } from '../components/organisms/AccountTab'
 import { Tabs } from '../components/molecules/Tabs'
+import { connect } from 'react-redux'
 
-export const ProfilePage = () => {
+export const ProfilePageRaw = ({ activeUser }) => {
+    const { role } = activeUser || {}
     const [active, setActive] = useState('Profile')
 
     const tabs = [
@@ -65,4 +67,8 @@ export const ProfilePage = () => {
         </div>
     )
 }
+
+const mapStateToProps = ({ activeUser }) => ({ activeUser })
+
+export const ProfilePage = connect(mapStateToProps, null)(ProfilePageRaw)
 

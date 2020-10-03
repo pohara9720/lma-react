@@ -28,6 +28,7 @@ export const FEED = 'FEED'
 export const HEALTH = 'HEALTH'
 export const REPRODUCTION = 'REPRODUCTION'
 export const ADMIN_ROLE = 'ADMIN'
+export const LMA_AUTH_TOKEN = 'LMA_AUTH_TOKEN'
 
 export const animalFilters = [
     { id: 'ALL_FILTERS', label: 'Filter', onClick: () => console.log('Hello') },

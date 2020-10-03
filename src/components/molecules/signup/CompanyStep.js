@@ -5,7 +5,7 @@ import { states } from '../../../dictionary'
 import { FileInput } from '../../atoms/FileInput'
 
 
-export const CompanyStep = () => {
+export const CompanyStep = ({ errors }) => {
     return (
         <fieldset>
             <div className="row">
@@ -18,7 +18,7 @@ export const CompanyStep = () => {
                                         <FileInput name='company_logo' label='Logo' />
                                     </div>
                                 </div>
-                                <Input label='Company Name' name="company_name" id="signup-company-name" placeholder="Enter Your Company Name" />
+                                <Input manualErrors={errors} label='Company Name' name="company_name" id="signup-company-name" placeholder="Enter Your Company Name" />
                                 <br />
                                 <div className="form-group">
                                     <div className="checkbox">
@@ -27,12 +27,12 @@ export const CompanyStep = () => {
                                     </div>
                                 </div>
                                 <br />
-                                <Input label='Street Address' name="company_street" id="signup-company-street" placeholder="Enter Your Street Address" />
-                                <Input label='City' name="company_city" id="signup-company-email" placeholder="Enter Your City" />
+                                <Input manualErrors={errors} label='Street Address' name="company_street" id="signup-company-street" placeholder="Enter Your Street Address" />
+                                <Input manualErrors={errors} label='City' name="company_city" id="signup-company-email" placeholder="Enter Your City" />
                                 <div className="form-group">
                                     <Select options={states} label='State' name='company_state' />
                                 </div>
-                                <Input label='Zip Code' type='number' name="company_zip" id="signup-company-zipcode" placeholder="Enter Your Zip Code" />
+                                <Input manualErrors={errors} label='Zip Code' type='number' name="company_zipcode" id="signup-company-zipcode" placeholder="Enter Your Zip Code" />
                             </div>
                         </div>
                     </div>

@@ -1,5 +1,6 @@
 import React from 'react'
 import { API_URL } from '../config'
+import { LMA_AUTH_TOKEN } from '../dictionary';
 
 export const useFetch = (url, options) => {
     const [data, setResponse] = React.useState(null);
@@ -7,7 +8,8 @@ export const useFetch = (url, options) => {
     const [loading, setIsLoading] = React.useState(false);
     const { method = 'GET', body, ...rest } = options || {}
     const headers = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem(LMA_AUTH_TOKEN)}`
     }
 
     React.useEffect(() => {

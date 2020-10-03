@@ -8,8 +8,10 @@ export const SelectRaw = ({
     label: selectLabel,
     defaultValue,
     meta: { touched, error },
+    manualErrors,
     ...rest
 }) => {
+    const message = manualErrors && manualErrors.find(x => x.name === input.name)
     return (
         <>
             {selectLabel && <label>{selectLabel}</label>}
@@ -19,6 +21,7 @@ export const SelectRaw = ({
                 }
             </select>
             {touched && error && <p style={{ color: 'red' }}>{error}</p>}
+            {message && message.message && <p style={{ color: 'red' }}>{message.message}</p>}
         </>
     )
 }

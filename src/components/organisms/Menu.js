@@ -15,7 +15,7 @@ const Avatar = styled.div`
 `
 
 
-export const MenuRaw = ({ match }) => {
+export const MenuRaw = ({ match, history }) => {
     const { url } = match
     const [active, setActive] = useState(url)
     const [isOpen, setIsOpen] = useState(false)
@@ -43,6 +43,12 @@ export const MenuRaw = ({ match }) => {
     const iconStyle = { marginRight: 10 }
 
     const dropdownStyle = isOpen ? { display: 'block' } : {}
+
+    const logout = () => {
+        localStorage.clear()
+        history.push('/login')
+
+    }
 
     return (
         <div>
@@ -76,10 +82,10 @@ export const MenuRaw = ({ match }) => {
                                             <i className="bx bx-user mr-50"></i> Profile
                                         </Link>
                                         <div className="dropdown-divider mb-0"></div>
-                                        <Link className="dropdown-item" to="/login">
+                                        <a onClick={logout} className="dropdown-item">
                                             <i className="bx bx-power-off mr-50"></i>
                                         Logout
-                                        </Link>
+                                        </a>
                                     </div>
                                 </li>
                             </ul>

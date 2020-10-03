@@ -20,22 +20,32 @@ import { LoginPage } from '../../pages/LoginPage';
 import { SignupPage } from '../../pages/SignupPage';
 import { AnimalDetailPage } from '../../pages/AnimalDetailPage'
 import T from 'prop-types'
+import { AuthProvider } from './AuthProvider'
 import { ErrorBoundary } from '../molecules/ErrorBoundary';
 import { ErrorPage } from '../../pages/ErrorPage';
 import { ForgotPasswordPage } from '../../pages/ForgotPasswordPage';
 import { ChangePasswordPage } from '../../pages/ChangePasswordPage'
+import { LMA_AUTH_TOKEN } from '../../dictionary';
 
 // const history = createBrowserHistory()
 
 const Route = ({ authenticated, children, ...rest }) => {
+    const token = localStorage.getItem(LMA_AUTH_TOKEN)
+
+    if (!token && authenticated) {
+        return <Redirect exact to='/login' />
+    }
+
     return authenticated
         ? (
             <ErrorBoundary isPage>
-                <RawRoute {...rest}>
-                    <Menu />
-                    {children}
-                    <Footer />
-                </RawRoute>
+                <AuthProvider>
+                    <RawRoute {...rest}>
+                        <Menu />
+                        {children}
+                        <Footer />
+                    </RawRoute>
+                </AuthProvider>
             </ErrorBoundary>
         )
         : (

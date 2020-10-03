@@ -1,24 +1,37 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import logo from '../app-assets/images/logo/logo.png'
 import { validator } from '../helpers/validator'
 import * as yup from 'yup'
+import { connect } from 'react-redux'
 import { reduxForm } from 'redux-form'
 import { Input } from '../components/atoms/Input'
+import { api } from '../helpers/api'
+import { compose } from 'recompose'
+import { setActiveUser } from '../redux/actions/users'
+import { LMA_AUTH_TOKEN } from '../dictionary'
+import { loadCompany } from '../redux/actions/company'
 
 const schema = yup.object().shape({
     email: yup.string().email().required(),
     password: yup.string().required()
 })
 
-export const LoginPageRaw = ({ handleSubmit }) => {
+export const LoginPageRaw = ({ handleSubmit, setActiveUser, history, loadCompany }) => {
 
-    const submit = values => {
-        console.log(values)
+    const onSubmit = async values => {
+        const { data: { user, token } } = await api.post('api-token-auth/', values)
+        if (user && token) {
+            const { company, ...rest } = user
+            localStorage.setItem(LMA_AUTH_TOKEN, token)
+            setActiveUser(rest)
+            loadCompany(company)
+            history.push(`/animals`)
+        }
     }
 
     return (
-        <form onSubmit={handleSubmit(submit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <div className="boxicon-layout no-card-shadow blank-page login" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
                 <div className="app-content content">
                     <div className="content-wrapper" style={{ padding: 0 }}>
@@ -54,11 +67,9 @@ export const LoginPageRaw = ({ handleSubmit }) => {
                                                                     </Link>
                                                                 </div>
                                                                 <br />
-                                                                <Link to='/animals'>
-                                                                    <div className="form-group text-left">
-                                                                        <button type="submit" className="btn btn-primary glow w-45">Log In</button>
-                                                                    </div>
-                                                                </Link>
+                                                                <div className="form-group text-left">
+                                                                    <button type="submit" className="btn btn-primary glow w-45">Log In</button>
+                                                                </div>
                                                             </form>
                                                             <div className="text-left"><small className="mr-25">Don't have an account?</small>
                                                                 <Link to="/signup"><small>Sign up</small></Link>
@@ -79,4 +90,13 @@ export const LoginPageRaw = ({ handleSubmit }) => {
     )
 }
 
-export const LoginPage = reduxForm({ form: 'loginForm', asyncValidate: validator(schema) })(LoginPageRaw)
+const mapDispatchToProps = dispatch => ({
+    setActiveUser: (user) => dispatch(setActiveUser({ user })),
+    loadCompany: (company) => dispatch(loadCompany({ company }))
+})
+
+export const LoginPage = compose(
+    withRouter,
+    connect(null, mapDispatchToProps),
+    reduxForm({ form: 'loginForm', asyncValidate: validator(schema) })
+)(LoginPageRaw)

@@ -78,7 +78,8 @@ const ModalContentRaw = ({ initialize, handleSubmit, onSubmit, ...rest }) => {
 
 const ModalContent = reduxForm({ form: 'companyUserForm', validate })(ModalContentRaw)
 
-export const ManageUsersTabRaw = ({ loadUsers, users }) => {
+export const ManageUsersTabRaw = ({ loadUsers, users, company }) => {
+    const { id: companyId } = company || {}
     const onDelete = async id => {
         const result = await api.delete(`user/${id}`)
         const state = users.filter((user) => user.id !== id)
@@ -131,7 +132,7 @@ export const ManageUsersTabRaw = ({ loadUsers, users }) => {
 
     useEffect(() => {
         const fetch = async () => {
-            const { data: init } = await api.get('user') //NOTE - need to change this to users after authentication
+            const { data: init } = await api.get('user')
             loadUsers(init)
         }
         fetch()
@@ -158,7 +159,7 @@ export const ManageUsersTabRaw = ({ loadUsers, users }) => {
     )
 }
 
-const mapStateToProps = ({ users }) => ({ users })
+const mapStateToProps = ({ users, company }) => ({ users, company })
 const mapDispatchToProps = dispatch => ({
     loadUsers: (users) => dispatch(listUsers({ users }))
 })

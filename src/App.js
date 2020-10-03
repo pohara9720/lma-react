@@ -1,11 +1,9 @@
 import React from 'react';
 import { Routes } from './components/atoms/Routes'
-import { Provider, connect } from 'react-redux';
+import { Provider } from 'react-redux';
 import logger from "redux-logger";
 import { rootReducer, initState as initialState } from './redux/reducers/index'
 import { createStore, applyMiddleware } from "redux";
-import { useFetch } from './hooks/useFetch';
-import { loadCompany } from './redux/actions/company'
 
 
 // GLOBAL CSS
@@ -38,32 +36,12 @@ const middlewares = [logger];
 
 const store = createStore(rootReducer, initialState, applyMiddleware(...middlewares));
 
-const mapDispathToProps = dispatch => ({
-  loadCompany: (company) => dispatch(loadCompany({ company }))
-})
-
-// const mapStateToProps = state => ({
-//   ...state
-// })
-
-const AuthProviderRaw = ({ children, loadCompany, ...rest }) => {
-  const { data, loading, error } = useFetch('/company')
-  data && loadCompany(data?.results[0])
-  return (
-    <div>{children}</div>
-  )
-}
-
-const AuthProvider = connect(null, mapDispathToProps)(AuthProviderRaw)
-
 
 const App = () => {
 
   return (
     <Provider store={store}>
-      <AuthProvider>
-        <Routes />
-      </AuthProvider>
+      <Routes />
     </Provider>
   );
 }
