@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BreadCrumbs } from '../components/molecules/BreadCrumbs'
 import { useModal } from '../hooks/useModal'
 import { readDate } from '../helpers/index'
@@ -8,8 +8,7 @@ import { useTable } from '../hooks/useTable'
 import { TableHeaderActions } from '../components/molecules/TableHeaderActions'
 import { animalOptions, animalFilters } from '../dictionary'
 import { BulletLabel } from '../components/atoms/BulletLabel'
-import { Loading } from '../components/atoms/Loading'
-import { useFetch } from '../hooks/useFetch'
+import { api } from '../helpers/api'
 import { connect } from 'react-redux'
 import { listAnimals } from '../redux/actions/animals'
 import { Link } from 'react-router-dom'
@@ -41,15 +40,28 @@ const columns = [
 
 ]
 
-export const AnimalsPageRaw = ({ listAnimals }) => {
+export const AnimalsPageRaw = ({ listAnimals, animals }) => {
     const { Modal, toggle } = useModal()
-    const { data, loading, error } = useFetch('/animal')
-    const { Table, selected } = useTable(data?.results, columns)
+    const { Table, selected } = useTable(animals, columns)
 
-    if (loading) return <Loading />
-    if (error) throw error
+    useEffect(() => {
+        const fetch = async () => {
+            const { data: init } = await api.get('animal')
+            listAnimals(init.results)
+        }
+        fetch()
+    }, [])
 
-    data && listAnimals(data.results)
+    const onSubmit = async values => {
+        let formData = new FormData();
+        Object.entries(values).map(entry => {
+            const [key, value] = entry
+            formData.append(key, value)
+        })
+        const { data } = await api.post('animal/', formData)
+        listAnimals([data, ...animals])
+        toggle()
+    }
 
     return (
         <div className="app-content content">
@@ -62,8 +74,8 @@ export const AnimalsPageRaw = ({ listAnimals }) => {
                         <TableHeaderActions options={animalOptions} filters={animalFilters} />
                         <Table />
                     </section>
-                    <Modal actionless title='Add Animal' onClose={toggle} onSubmit={() => console.log('implements')}>
-                        <AddorEditAnimal onClose={toggle} />
+                    <Modal actionless title='Add Animal' onClose={toggle}>
+                        <AddorEditAnimal onClose={toggle} onSubmit={onSubmit} />
                     </Modal>
                 </div>
             </div>
@@ -71,8 +83,10 @@ export const AnimalsPageRaw = ({ listAnimals }) => {
     )
 }
 
+const mapStateToProps = ({ animals }) => ({ animals })
+
 const mapDispathToProps = dispatch => ({
     listAnimals: (animals) => dispatch(listAnimals({ animals }))
 })
 
-export const AnimalsPage = connect(null, mapDispathToProps)(AnimalsPageRaw)
+export const AnimalsPage = connect(mapStateToProps, mapDispathToProps)(AnimalsPageRaw)

@@ -1,9 +1,18 @@
 import React, { useState } from 'react'
+import { FEED, BREEDING, OTHER, HEALTH, REPRODUCTION } from '../../dictionary'
 
 export const TodoItem = ({ item }) => {
     const [checked, setChecked] = useState(item.completed)
-    const { title, img, label } = item
-    const { color, name } = label
+    const { title, category } = item
+
+    const colors = {
+        [FEED]: 'primary',
+        [BREEDING]: 'warning',
+        [OTHER]: 'info',
+        [HEALTH]: 'success',
+        [REPRODUCTION]: 'danger'
+    }
+
     const onClick = () => {
         setChecked(!checked)
         //API CALL TO MAKE TASK
@@ -20,12 +29,12 @@ export const TodoItem = ({ item }) => {
                 </div>
                 <div className="todo-item-action d-flex align-items-center">
                     <div>
-                        <span className={`bullet bullet-sm ${color}`}></span>
-                        <span>{name}</span>
+                        <span className={`bullet bullet-sm bullet-${colors[category]}`} style={{ marginRight: 8 }}></span>
+                        <span>{category}</span>
                     </div>
-                    <div className="avatar ml-1">
-                        <img src={img} alt="avatar" height="30" width="30" />
-                    </div>
+                    {/* <div className="avatar ml-1">
+                        <img src={logo} alt="avatar" height="30" width="30" />
+                    </div> */}
                     <a className='todo-item-delete ml-75'><i className="bx bx-trash"></i></a>
                 </div>
             </div>

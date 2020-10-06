@@ -7,17 +7,17 @@ import { reduxForm } from 'redux-form'
 import * as yup from 'yup'
 import { connect } from 'react-redux'
 import { compose } from 'recompose'
-import { validator } from '../../helpers/validator'
+import { validator, fileSchema } from '../../helpers/validator'
 import { FileInput } from '../atoms/FileInput'
 
 const schema = yup.object().shape({
     name: yup.string().required('Company name is required'),
+    logo: fileSchema,
     email: yup.string().email().required('Email is required'),
     street: yup.string().required('Company name is required'),
     city: yup.string().required('Company name is required'),
     state: yup.string().required('Company name is required'),
     zipcode: yup.number().test('len', 'Zipcode must be 5 characters', val => val.toString().length === 5).required('Zipcode is required'),
-
 })
 
 export const CompanyTabRaw = ({ company, initialize, handleSubmit, ...rest }) => {
@@ -38,13 +38,7 @@ export const CompanyTabRaw = ({ company, initialize, handleSubmit, ...rest }) =>
         formData.append("state", state);
         formData.append("zipcode", zipcode);
         formData.append("name", name);
-        // const payload = {
-        //     logo: formData,
-        //     ...other
-        // }
-        // console.log('PAYLOAD', formData.get('logo'))
         const { data } = await api.patch(`company/${id}/`, formData)
-        console.log('DATA', data)
     }
 
     return (

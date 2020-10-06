@@ -1,3 +1,4 @@
+import { unique } from './helpers/index'
 export const COW = 'COW'
 export const CATTLE = 'CATTLE'
 export const SHEEP = 'SHEEP'
@@ -29,6 +30,15 @@ export const HEALTH = 'HEALTH'
 export const REPRODUCTION = 'REPRODUCTION'
 export const ADMIN_ROLE = 'ADMIN'
 export const LMA_AUTH_TOKEN = 'LMA_AUTH_TOKEN'
+
+
+export const define = (dictionary = [], id) => {
+    const found = dictionary.filter(x => x.id === id)
+    if (!found) {
+        throw new Error('Nothing was found')
+    }
+    return found.label
+}
 
 export const animalFilters = [
     { id: 'ALL_FILTERS', label: 'Filter', onClick: () => console.log('Hello') },

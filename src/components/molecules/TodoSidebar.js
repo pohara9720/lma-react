@@ -1,9 +1,7 @@
 import React, { useState } from 'react'
 
-export const TodoSidebar = () => {
-    const [active, setActive] = useState()
+export const TodoSidebar = ({ onClick, active }) => {
     const className = key => key === active ? 'task-filter-active' : ''
-    const onClick = key => setActive(key)
 
     const filters = [
         {
@@ -50,7 +48,7 @@ export const TodoSidebar = () => {
                 <div className="list-group" style={{ paddingRight: 10 }}>
                     {
                         filters.map((item, i) =>
-                            <a onClick={() => onClick(item.name)} key={i} href="#" className="list-group-item border-0 d-flex align-items-center justify-content-between" style={{ padding: '10px 0' }}>
+                            <a onClick={() => onClick(item)} key={i} href="#" className="list-group-item border-0 d-flex align-items-center justify-content-between" style={{ padding: '10px 0' }}>
                                 <span className={className(item.name)}>{item.name}</span>
                                 <Element {...item} />
                             </a>
@@ -60,7 +58,7 @@ export const TodoSidebar = () => {
                 <label className="filter-label mt-2 mb-1 pt-25">Labels</label>
                 <div className="list-group" style={{ paddingRight: 10 }}>
                     {labels.map((item, i) =>
-                        <a onClick={() => onClick(item.name)} key={i} href="#" className="list-group-item border-0 d-flex align-items-center justify-content-between" style={{ padding: '10px 0' }}>
+                        <a onClick={() => onClick(item)} key={i} href="#" className="list-group-item border-0 d-flex align-items-center justify-content-between" style={{ padding: '10px 0' }}>
                             <span className={className(item.name)}>{item.name}</span>
                             <Element {...item} />
                         </a>

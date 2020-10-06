@@ -3,7 +3,6 @@ import logo from '../app-assets/images/logo/logo.png'
 import { Link, withRouter } from 'react-router-dom'
 import { Wizard } from '../components/organisms/Wizard'
 import { reduxForm, change } from 'redux-form'
-import { validator } from '../helpers/validator'
 import * as yup from 'yup'
 import { connect } from 'react-redux'
 import { AccountStep } from '../components/molecules/signup/AccountStep'
@@ -12,6 +11,7 @@ import { CompanyStep } from '../components/molecules/signup/CompanyStep'
 import { MembershipStep } from '../components/molecules/signup/MembershipStep'
 import { PaymentStep } from '../components/molecules/signup/PaymentStep'
 import { compose } from 'recompose'
+import { api } from '../helpers/api'
 
 const schema = yup.object().shape({
     first_name: yup.string().required('First name is required'),
@@ -34,11 +34,7 @@ const schema = yup.object().shape({
     company_city: yup.string().required('City is required'),
     company_state: yup.string().required('State is required'),
     company_zipcode: yup.number().test('len', 'Zipcode must be 5 characters', val => val && val.toString().length === 5),
-    company_logo: yup.object().shape({
-        file: yup.object().shape({
-            name: yup.string().required()
-        }).label('File')
-    }),
+    // company_logo: yup.,
     subscription: yup.string().required('State is required'),
     payment_name: yup.string().required('Name is required'),
     payment_card: yup.string().required('Card number is required'),
@@ -78,13 +74,24 @@ export const SignupPageRaw = ({ changeFieldValue, handleSubmit, initialize, ...r
 
     const validate = (values) => {
         schema.validate(values, { abortEarly: false }).catch(({ inner }) => {
-            const fieldErrors = inner.map(({ message, path }) => ({ message, name: path }))
-            setErrors(fieldErrors)
+            if (inner && inner.length) {
+                const fieldErrors = inner.map(({ message, path }) => ({ message, name: path }))
+                setErrors(fieldErrors)
+            }
         })
     }
 
-    const onSubmit = values => {
+    const onSubmit = async values => {
         validate(values)
+        if (!errors.length) {
+            let formData = new FormData();
+            Object.entries(values).map(entry => {
+                const [key, value] = entry
+                formData.append(key, value)
+            })
+            const { data } = await api.post('user/1/register/', formData)
+            console.log('DATA', data)
+        }
     };
 
     console.log(errors)

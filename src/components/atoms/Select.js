@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Field } from 'redux-form'
-
+import { api } from '../../helpers/api'
 
 export const SelectRaw = ({
     input,
@@ -17,7 +17,7 @@ export const SelectRaw = ({
             {selectLabel && <label>{selectLabel}</label>}
             <select className="form-control" {...input} {...rest}>
                 {
-                    options.map(({ id, label }, i) => <option defaultValue={defaultValue || options[0].id} key={i} value={id}>{label}</option>)
+                    options.length && options.map(({ id, label }, i) => <option defaultValue={defaultValue || options[0].id} key={i} value={id}>{label}</option>)
                 }
             </select>
             {touched && error && <p style={{ color: 'red' }}>{error}</p>}
@@ -28,3 +28,25 @@ export const SelectRaw = ({
 
 export const Select = (props) => <Field component={SelectRaw} {...props} />
 
+export const ParentSelect = ({ parent, type }) => {
+    const [options, setOptions] = useState([])
+    const isFather = parent === 'father'
+    const label = isFather ? 'Sire' : 'Dam'
+    const payload = type ? { type } : { type: 'N/A' }
+    useEffect(() => {
+        const fetch = async () => {
+            const notInSystem = { id: 'N/A', label: 'No in system' }
+            const { data } = await api.post('animal/get_parents/', payload)
+            setOptions([notInSystem, ...data[parent]])
+        }
+        fetch()
+    }, [type])
+
+    const format = options.map(({ id, label, tag_number, name }) => {
+        const val = label ? label : `${name} (#${tag_number})`
+        return { id, label: val }
+    })
+    return (
+        <Select options={format} label={label} name={parent} />
+    )
+}

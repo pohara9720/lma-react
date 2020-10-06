@@ -1,8 +1,8 @@
 import React from 'react'
-import { animalTypes, animalSubTypes } from '../../dictionary'
+import { animalTypes, animalSubTypes, COW } from '../../dictionary'
 import { reduxForm, getFormValues } from 'redux-form'
-import { validator } from '../../helpers/validator'
-import { Select } from '../atoms/Select'
+import { validator, fileSchema } from '../../helpers/validator'
+import { Select, ParentSelect } from '../atoms/Select'
 import { Input } from '../atoms/Input'
 import { connect } from 'react-redux'
 import * as yup from 'yup'
@@ -10,23 +10,17 @@ import { compose } from 'recompose'
 import { AttachmentInput, AvatarGroup } from '../atoms/FileInput'
 import moment from 'moment'
 
-const imageSchema = yup.object().shape({
-    file: yup.object().shape({
-        name: yup.string().required()
-    }).label('File')
-})
-
 const schema = yup.object().shape({
-    profile_image: imageSchema,
-    header_image: imageSchema,
-    type: yup.string().required(),
-    sub_type: yup.string().required(),
-    name: yup.string().required(),
-    registration_number: yup.number().required(),
-    tag_number: yup.number().required(),
+    profile_image: fileSchema.required('* Required'),
+    header_image: fileSchema.required('* Required'),
+    type: yup.string().required('Type is required'),
+    sub_type: yup.string().required('Subtype is required'),
+    name: yup.string().required('Name is required'),
+    registration_number: yup.number().required('Registration number is required'),
+    tag_number: yup.number().required('Tag number is required'),
     breed: yup.string(),
-    father: yup.string().required(),
-    mother: yup.string().required(),
+    father: yup.string().required('Sire is required if not in system select N/A'),
+    mother: yup.string().required('Dam is required if not in system select N/A'),
     dob: yup.string().test(
         "dob",
         "Date of Birth must be before today",
@@ -34,31 +28,16 @@ const schema = yup.object().shape({
             return moment(value).isBefore(moment(), 'days');
         }
     ),
-    attachment: imageSchema
+    attachment: fileSchema
 })
 
-const ParentSelect = ({ parent, type }) => {
-    const isFather = parent === 'father'
-    const label = isFather ? 'Sire' : 'Dam'
-    const payload = { type, parent }
-    // NEED TO MAKE ACTION FOR GETTING MALES AND FEMALES BASED ON TYPE
-    return (
-        <Select options={animalTypes} label={label} name={parent} />
-    )
-}
-
-export const AddorEditAnimalRaw = ({ formValues, onClose, handleSubmit }) => {
+export const AddorEditAnimalRaw = ({ formValues, onClose, handleSubmit, onSubmit }) => {
 
     const { type } = formValues || {}
     const subtypes = animalSubTypes[type] || []
-    const notInSystem = { id: 'N/A', label: 'Not in System' }
-
-    const submit = values => {
-        console.log(values)
-    }
 
     return (
-        <form onSubmit={handleSubmit(submit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <div className="card-content collapse show" aria-expanded="true">
                 <div className="container mt-1">
                     <div className="row">

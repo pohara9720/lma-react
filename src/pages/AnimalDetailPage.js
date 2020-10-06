@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { withRouter } from 'react-router-dom'
 import { BreadCrumbs } from '../components/molecules/BreadCrumbs'
 import { AnimalInfo } from '../components/molecules/AnimalInfo'
@@ -7,18 +7,26 @@ import { HealthTab } from '../components/organisms/HealthTab'
 import { OffspringTab } from '../components/organisms/OffspringTab'
 import { ProfitTab } from '../components/organisms/ProfitTab'
 import { Tabs } from '../components/molecules/Tabs'
-import { useFetch } from '../hooks/useFetch'
-import { Loading } from '../components/atoms/Loading'
+import { api } from '../helpers/api'
+import { HEALTH } from '../dictionary'
 
-export const AnimalDetailPageRaw = ({ match }) => {
+export const AnimalDetailPageRaw = ({ match, ...rest }) => {
     const [active, setActive] = useState('Breeding')
+    const [animal, setAnimal] = useState(null)
+    const [tasks, setTasks] = useState([])
+    const [children, setChildren] = useState([])
 
-    const { data, loading, error } = useFetch(`/animal/${match.params.animalId}`)
-
-    if (loading) return <Loading />
-    if (error) throw error
-
-    console.log(data)
+    useEffect(() => {
+        const fetch = async () => {
+            const { data: animal } = await api.get(`animal/${match.params.animalId}`)
+            const { data: tasks } = await api.post(`animal/${animal.id}/get_tasks/`)
+            const { data: children } = await api.post(`animal/get_offspring/`, { id: animal.id, sub_type: animal.sub_type })
+            setAnimal(animal)
+            setTasks(tasks)
+            setChildren(children)
+        }
+        fetch()
+    }, [match.params.animalId])
 
     const tabs = [
         {
@@ -39,13 +47,16 @@ export const AnimalDetailPageRaw = ({ match }) => {
         }
     ]
 
+    const healthTasks = tasks.filter(({ category }) => category === HEALTH)
+    const otherTasks = tasks.filter(({ category }) => category !== HEALTH)
+
     const renderPage = (active) => {
         switch (active) {
             case 'Profitability': return <ProfitTab />
-            case 'Offspring': return <OffspringTab />
-            case 'Health': return <HealthTab />
-            case 'Breeding': return <BreedingTab />
-            default: return <BreedingTab />
+            case 'Offspring': return <OffspringTab offspring={children} setActive={setActive} />
+            case 'Health': return <HealthTab tasks={healthTasks} />
+            case 'Breeding': return <BreedingTab tasks={otherTasks} />
+            default: return <BreedingTab tasks={otherTasks} />
         }
     }
 
@@ -60,7 +71,7 @@ export const AnimalDetailPageRaw = ({ match }) => {
                 <div className="content-body">
                     <section className="invoice-list-wrapper">
                         <div className='row'>
-                            <AnimalInfo animal={data} />
+                            <AnimalInfo animal={animal} />
                             <div className="col-md-8 animal-detail-info">
                                 <div className="card widget-overlay">
                                     <div className="card widget-overlay-card mb-0">

@@ -7,31 +7,32 @@ import { Input } from '../atoms/Input'
 import { TextArea } from '../atoms/TextArea'
 import { MultiSelect } from '../atoms/MultiSelect'
 import * as yup from 'yup'
-import { taskCategories, BREEDING, OTHER } from '../../dictionary'
+import { taskCategories, BREEDING } from '../../dictionary'
 import { connect } from 'react-redux'
 import { compose } from 'recompose'
 
 const schema = yup.object().shape({
-    category: yup.string().required(),
-    title: yup.string().required(),
-    assigned_date: yup.string().required(),
-    description: yup.string().required(),
-    users: yup.array().of(yup.string()).required(),
-    due_date: yup.string().when('category', { is: c => c === BREEDING, then: s => s.required() }), //ONLY BREEDING
-    cost: yup.number().when('category', { is: c => c !== BREEDING, then: s => s.required() }), //EVERYTHING BUT BREEDING
-    animals: yup.array().of(yup.string()).when('category', { is: c => c !== OTHER, then: s => s.required() }), //EVERYTHING BUT OTHER
+    category: yup.string().required('Category is required'),
+    title: yup.string().required('Title is required'),
+    assigned_date: yup.string().required('Start date is required'),
+    description: yup.string().required('Description is required'),
+    animals: yup.array().of(yup.string()).required('At least 1 animal must be selected'),
+    users: yup.array().of(yup.string()).required('At least 1 user must be selected'),
+    // conditionals
+    due_date: yup.string().when('category', { is: c => c === BREEDING, then: s => s.required('Due date is required') }), //ONLY BREEDING
+    cost: yup.number().when('category', { is: c => c !== BREEDING, then: s => s.required('Cost is required') }), //EVERYTHING BUT BREEDING
+    // .when('category', { is: c => c !== OTHER, then: s => s.required() }), //EVERYTHING BUT OTHER
 })
 
-export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit }) => {
+export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, users, onSubmit }) => {
     const { category } = formValues || {}
     const isBreeding = category === BREEDING
-    const isOther = category === OTHER
-    const userOptions = toMulti(taskCategories)
-    const submit = values => {
-        console.log(values)
-    }
+    const isActive = users.filter(({ is_active }) => is_active === true)
+    const userOptions = toMulti(isActive, (({ first_name, last_name }) => `${first_name} ${last_name}`))
+    const animalOptions = toMulti(animals, (({ tag_number, name }) => `${name} (Tag# ${tag_number})`))
+
     return (
-        <form id="compose-form" className="mt-1" onSubmit={handleSubmit(submit)}>
+        <form id="compose-form" className="mt-1" onSubmit={handleSubmit(onSubmit)}>
             <div className="card-content">
                 <div className="card-body py-0 border-bottom">
                     <div className='form-group'>
@@ -43,7 +44,7 @@ export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit }) => {
                     {
                         !isBreeding &&
                         <div className="form-group">
-                            <Input label='Cost' name="cost" id="task-form-cost" placeholder="Title" />
+                            <Input label='Cost' type='number' name="cost" id="task-form-cost" placeholder="Cost" />
                         </div>
                     }
                     <div className="assigned d-flex justify-content-between">
@@ -60,12 +61,9 @@ export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit }) => {
                     <div className="form-group">
                         <MultiSelect options={userOptions} placeholder='Select Users' name='users' label='Users Assigned To' />
                     </div>
-                    {
-                        !isOther &&
-                        <div className="form-group">
-                            <MultiSelect options={userOptions} placeholder='Select Animals' name='animals' label='Animals Assigned To' />
-                        </div>
-                    }
+                    <div className="form-group">
+                        <MultiSelect options={animalOptions} placeholder='Select Animals' name='animals' label='Animals Assigned To' />
+                    </div>
                     <div className='form-group'>
                         <TextArea name='description' cols="1" rows="4" placeholder='Description' label='Description' />
                     </div>
@@ -123,6 +121,8 @@ export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit }) => {
 
 export const AddorEditTask = compose(
     connect(state => ({
+        animals: state.animals,
+        users: state.users,
         formValues: getFormValues('taskForm')(state)
     })),
     reduxForm({ form: 'taskForm', asyncValidate: validator(schema) }))(AddorEditTaskRaw)

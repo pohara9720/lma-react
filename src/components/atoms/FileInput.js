@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Field } from 'redux-form'
 import cow from '../../app-assets/images/slider/cow.jpg'
 
-const Uploader = ({ input, label, init }) => {
+const Uploader = ({ input, label, init, meta: { touched, error } }) => {
     const [preview, setPreview] = useState(init || cow)
     const onInputChange = (e) => {
         e.preventDefault();
@@ -21,7 +21,8 @@ const Uploader = ({ input, label, init }) => {
                 <h4 className="media-heading">{label}</h4>
                 <div className="col-12 px-0 d-flex">
                     <div>
-                        <input type="file" onChange={onInputChange} />
+                        <input type="file" onChange={onInputChange} accept="image/jpg, image/jpeg, image/png,.pdf,.csv" />
+                        {touched && error && <p style={{ color: 'red' }}>{error}</p>}
                     </div>
                 </div>
             </div>
@@ -29,20 +30,23 @@ const Uploader = ({ input, label, init }) => {
     )
 }
 
-const Attachment = ({ input }) => {
+const Attachment = ({ input, meta: { touched, error } }) => {
+    console.log(error)
     const onInputChange = e => {
         const file = e.target.files[0];
         input.onChange(file)
     }
     return (
         <>
-            <input type="file" onChange={onInputChange} />
+            <input type="file" onChange={onInputChange} accept=".pdf,.csv" />
+            {touched && error && <p style={{ color: 'red' }}>{error}</p>}
         </>
     )
 }
 
 
-const HeaderAvatar = ({ input }) => {
+const HeaderAvatar = ({ input, meta: { touched, error } }) => {
+    console.log(error)
     const [preview, setPreview] = useState(null)
     const onInputChange = (e) => {
         e.preventDefault();
@@ -65,11 +69,13 @@ const HeaderAvatar = ({ input }) => {
                     <i className='bx bx-plus' />
                 </div>
             }
-            <input id='head-upload' type='file' style={{ display: 'none' }} onChange={onInputChange} />
+            <input id='head-upload' type='file' style={{ display: 'none' }} onChange={onInputChange} accept="image/jpg, image/jpeg, image/png" />
+            {touched && error && <p style={{ color: 'red' }}>{error}</p>}
         </>
     )
 }
-const ProfileAvatar = ({ input }) => {
+const ProfileAvatar = ({ input, meta: { touched, error } }) => {
+    console.log(error)
     const [preview, setPreview] = useState(null)
     const onInputChange = (e) => {
         e.preventDefault();
@@ -92,8 +98,8 @@ const ProfileAvatar = ({ input }) => {
                     <i className='bx bx-plus' />
                 </div>
             }
-            <input id='prof-upload' type='file' style={{ display: 'none' }} onChange={onInputChange} />
-
+            <input id='prof-upload' type='file' style={{ display: 'none' }} onChange={onInputChange} accept="image/jpg, image/jpeg, image/png" />
+            {touched && error && <p style={{ color: 'red' }}>{error}</p>}
         </>
     )
 }

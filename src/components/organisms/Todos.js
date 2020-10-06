@@ -1,33 +1,39 @@
 import React from 'react'
 import { TodoItem } from '../atoms/TodoItem'
-import { withTasks } from '../../hoc/withTasks'
-import { ActionDropdown } from '../atoms/ActionDropdown'
-import { taskFilters } from '../../dictionary'
+// import { ActionDropdown } from '../atoms/ActionDropdown'
+import { FEED, BREEDING, OTHER, HEALTH, REPRODUCTION } from '../../dictionary'
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 const localizer = momentLocalizer(moment)
 
-const Calendar = () =>
+export const mapForCalendar = data => {
+    const colors = {
+        [FEED]: '#5A8DEE',
+        [BREEDING]: '#FDAC41',
+        [OTHER]: '#00CFDD',
+        [HEALTH]: '#39DA8A',
+        [REPRODUCTION]: '#FF5B5C'
+    }
+    return data.map(({ assigned_date, due_date, title, category }) =>
+        ({ title, start: assigned_date, end: due_date, color: colors[category] }))
+}
+
+const Calendar = ({ tasks }) =>
     <BigCalendar
         localizer={localizer}
-        events={[{
-            title: 'Title',
-            start: '2020-09-01',
-            end: '2020-09-11'
-        }]}
+        events={mapForCalendar(tasks)}
         startAccessor="start"
         endAccessor="end"
         style={{ height: 500 }}
+        eventPropGetter={event => ({ style: { backgroundColor: event.color } })}
     />
 
 
-
-
 const NoResults = () => (
-    <div className="no-results">
-        <h5>No Items Found</h5>
+    <div className="no-results" style={{ padding: 8 }}>
+        <h6>No Tasks Found</h6>
     </div>
 )
 
@@ -39,7 +45,7 @@ const TodoList = ({ tasks }) => {
     )
 }
 
-export const TodosRaw = ({ tasks }) => {
+export const Todos = ({ tasks }) => {
     return (
         <div className="content-right">
             <div className="content-wrapper">
@@ -48,7 +54,7 @@ export const TodosRaw = ({ tasks }) => {
                     <div className="todo-app-area">
                         <div className="todo-app-list-wrapper">
                             <div className="todo-app-list">
-                                <Calendar />
+                                <Calendar tasks={tasks} />
                                 <div style={{ marginBottom: 32 }} />
                                 <div className="todo-fixed-search d-flex justify-content-between align-items-center">
                                     <div className="sidebar-toggle d-block d-lg-none">
@@ -60,7 +66,7 @@ export const TodosRaw = ({ tasks }) => {
                                             <i className="bx bx-search"></i>
                                         </div>
                                     </fieldset>
-                                    <ActionDropdown options={taskFilters} />
+                                    {/* <ActionDropdown options={taskFilters} /> */}
                                 </div>
                                 <div className="todo-task-list list-group">
                                     <TodoList tasks={tasks} />
@@ -73,5 +79,3 @@ export const TodosRaw = ({ tasks }) => {
         </div>
     )
 }
-
-export const Todos = withTasks(TodosRaw)
