@@ -1,13 +1,15 @@
-import React from 'react'
-import { reduxForm } from 'redux-form'
+import React, { useEffect } from 'react'
+import { reduxForm, getFormValues } from 'redux-form'
 import { validator } from '../../helpers/validator'
-import { inventoryCategories } from '../../dictionary'
+import { inventoryCategories, animalTypes, EMBRYO, SEMEN } from '../../dictionary'
 import { Select, ParentSelect } from '../atoms/Select'
 import { Input } from '../atoms/Input'
+import { connect } from 'react-redux'
 import * as yup from 'yup'
-
+import { compose } from 'recompose'
 const schema = yup.object().shape({
     category: yup.string().required('Category is required'),
+    animal_category: yup.string().required('Animal type is required'),
     cost: yup.number().required('Cost is required'),
     tank_number: yup.number().required('Tank Number is required'),
     canister_number: yup.number().required('Canister Number is required'),
@@ -17,7 +19,14 @@ const schema = yup.object().shape({
     mother: yup.string().required('Mother is required'),
 })
 
-export const AddorEditInventoryRaw = ({ onClose, handleSubmit, onSubmit }) => {
+
+export const AddorEditInventoryRaw = ({ formValues, onClose, handleSubmit, initialize, onSubmit }) => {
+    const { animal_category, category } = formValues || {}
+
+    useEffect(() => {
+        initialize({ category: EMBRYO })
+    }, [])
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className="card-content collapse show" aria-expanded="true">
@@ -43,11 +52,20 @@ export const AddorEditInventoryRaw = ({ onClose, handleSubmit, onSubmit }) => {
                                 <Input label='Number of Units' type='number' name="units" id="inventory-form-units" placeholder="0" />
                             </div>
                             <div className="col-12 form-group">
-                                <ParentSelect parent='father' />
+                                <Select options={animalTypes} name='animal_category' label='Category' />
                             </div>
-                            <div className="col-12 form-group">
-                                <ParentSelect parent='mother' />
-                            </div>
+                            {
+                                category === SEMEN &&
+                                <div className="col-12 form-group">
+                                    <ParentSelect parent='father' type={animal_category} />
+                                </div>
+                            }
+                            {
+                                category === EMBRYO &&
+                                <div className="col-12 form-group">
+                                    <ParentSelect parent='mother' type={animal_category} />
+                                </div>
+                            }
                             <div className="col-12 form-group">
                                 <label className="d-block" htmlFor="">Sire and Dam</label>
                                 <small className="text-muted">* Only link if you own parents and are in Livestock Manager</small>
@@ -70,8 +88,13 @@ export const AddorEditInventoryRaw = ({ onClose, handleSubmit, onSubmit }) => {
                     </div>
                 </div>
             </div>
-        </form>
+        </form >
     )
 }
 
-export const AddorEditInventory = reduxForm({ form: 'inventoryForm', asyncValidate: validator(schema) })(AddorEditInventoryRaw)
+export const AddorEditInventory = compose(
+    connect(state => ({
+        formValues: getFormValues('inventoryForm')(state)
+    })),
+    reduxForm({ form: 'inventoryForm', asyncValidate: validator(schema) })
+)(AddorEditInventoryRaw)

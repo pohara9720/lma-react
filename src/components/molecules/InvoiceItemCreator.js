@@ -10,7 +10,7 @@ const InvoiceItem = ({ fields }) => (
     <div>
         {fields.map((field, i) => {
             return (
-                <div data-repeater-item>
+                <div data-repeater-item key={i}>
                     <div className="row mb-50 px-2">
                         <div className="d-none d-sm-block col-md-3 invoice-item-title">Type</div>
                         <div className="d-none d-sm-block col-md-3 invoice-item-title">Item</div>

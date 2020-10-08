@@ -9,6 +9,7 @@ export const SelectRaw = ({
     defaultValue,
     meta: { touched, error },
     manualErrors,
+    render,
     ...rest
 }) => {
     const message = manualErrors && manualErrors.find(x => x.name === input.name)
@@ -16,7 +17,9 @@ export const SelectRaw = ({
         <>
             {selectLabel && <label>{selectLabel}</label>}
             <select className="form-control" {...input} {...rest}>
-                {
+                {render ?
+                    options.length && options.map(item => render(item))
+                    :
                     options.length && options.map(({ id, label }, i) => <option defaultValue={defaultValue || options[0].id} key={i} value={id}>{label}</option>)
                 }
             </select>

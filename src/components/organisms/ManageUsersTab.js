@@ -86,7 +86,7 @@ export const ManageUsersTabRaw = ({ loadUsers, users, company }) => {
         loadUsers(state)
     }
     const onResendLink = async email => {
-        const { data } = await api.post('user/1/resend_email/', { email })
+        const { data } = await api.post('user/resend_email/', { email })
         console.log('DATA', data)
     }
 

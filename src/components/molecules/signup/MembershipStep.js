@@ -36,7 +36,7 @@ const MembershipCards = ({ active, setActive, options }) => {
 }
 
 
-export const MembershipStep = ({ quantity = 0, onChange }) => {
+export const MembershipStep = ({ quantity = 0, onChange, setTier }) => {
     const options = [
         {
             monthlyId: 'FREE',
@@ -104,7 +104,9 @@ export const MembershipStep = ({ quantity = 0, onChange }) => {
         const { monthlyId, annualId } = active
         const value = annual ? annualId : monthlyId
         onChange(value)
-    }, [active, annual])
+        setTier(active)
+    }, [active, annual, onChange, setTier])
+
     return (
         <fieldset>
             <div className="review-section row">

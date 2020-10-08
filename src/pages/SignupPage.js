@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import logo from '../app-assets/images/logo/logo.png'
 import { Link, withRouter } from 'react-router-dom'
 import { Wizard } from '../components/organisms/Wizard'
-import { reduxForm, change } from 'redux-form'
+import { reduxForm, change, getFormValues } from 'redux-form'
 import * as yup from 'yup'
 import { connect } from 'react-redux'
 import { AccountStep } from '../components/molecules/signup/AccountStep'
@@ -12,6 +12,7 @@ import { MembershipStep } from '../components/molecules/signup/MembershipStep'
 import { PaymentStep } from '../components/molecules/signup/PaymentStep'
 import { compose } from 'recompose'
 import { api } from '../helpers/api'
+import { setRegistered } from '../redux/actions/users'
 
 const schema = yup.object().shape({
     first_name: yup.string().required('First name is required'),
@@ -46,12 +47,7 @@ const schema = yup.object().shape({
     payment_zipcode: yup.number().test('len', 'Zipcode must be 5 characters', val => val && val.toString().length === 5),
 })
 
-const StepRaw = ({ wizard: { next, prev }, children, validate, last, history }) => {
-    // const onClick = last ? () => history.push('/animals') : next
-    const onNext = () => {
-        validate()
-        // next()
-    }
+const Step = ({ wizard: { next, prev }, children, last }) => {
     return (
         <div>
             {children}
@@ -66,11 +62,10 @@ const StepRaw = ({ wizard: { next, prev }, children, validate, last, history }) 
     )
 }
 
-const Step = withRouter(StepRaw)
-
-export const SignupPageRaw = ({ changeFieldValue, handleSubmit, initialize, ...rest }) => {
+export const SignupPageRaw = ({ changeFieldValue, handleSubmit, initialize, formValues, history, setRegisteredUser, ...rest }) => {
     const [quantity, setQuantity] = useState(0)
     const [errors, setErrors] = useState([])
+    const [tier, setTier] = useState(null)
 
     const validate = (values) => {
         schema.validate(values, { abortEarly: false }).catch(({ inner }) => {
@@ -83,15 +78,21 @@ export const SignupPageRaw = ({ changeFieldValue, handleSubmit, initialize, ...r
 
     const onSubmit = async values => {
         validate(values)
-        if (!errors.length) {
-            let formData = new FormData();
-            Object.entries(values).map(entry => {
-                const [key, value] = entry
-                formData.append(key, value)
-            })
-            const { data } = await api.post('user/1/register/', formData)
-            console.log('DATA', data)
+        try {
+            if (!errors.length) {
+                let formData = new FormData();
+                Object.entries(values).map(entry => {
+                    const [key, value] = entry
+                    formData.append(key, value)
+                })
+                const { data } = await api.post('user/1/register/', formData)
+                setRegisteredUser(data)
+                history.push('/resend-email')
+            }
+        } catch (error) {
+            console.log(error)
         }
+
     };
 
     console.log(errors)
@@ -137,7 +138,7 @@ export const SignupPageRaw = ({ changeFieldValue, handleSubmit, initialize, ...r
                                         <div className="card icon-tab">
                                             <div className="card-content mt-2">
                                                 <div className="card-body">
-                                                    <form className="wizard-horizontal">
+                                                    <div className="wizard-horizontal">
                                                         <Wizard error={!!errors.length} headerBreakpoint={600} progressStepsWidth={635} showHeader>
                                                             <Step title='Account'>
                                                                 <AccountStep errors={errors} />
@@ -149,13 +150,13 @@ export const SignupPageRaw = ({ changeFieldValue, handleSubmit, initialize, ...r
                                                                 <CompanyStep errors={errors} />
                                                             </Step>
                                                             <Step title='Membership'>
-                                                                <MembershipStep quantity={quantity} onChange={changeFieldValue} />
+                                                                <MembershipStep quantity={quantity} onChange={changeFieldValue} setTier={setTier} />
                                                             </Step>
                                                             <Step title='Payment' last>
-                                                                <PaymentStep errors={errors} />
+                                                                <PaymentStep errors={errors} tier={tier} values={formValues} />
                                                             </Step>
                                                         </Wizard>
-                                                    </form>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -170,11 +171,18 @@ export const SignupPageRaw = ({ changeFieldValue, handleSubmit, initialize, ...r
     )
 }
 
-const mapDispatchToProps = (dispatch) => ({ changeFieldValue: (value) => dispatch(change('signup', 'subscription', value)) })
+const mapDispatchToProps = (dispatch) => ({
+    changeFieldValue: (value) => dispatch(change('signup', 'subscription', value)),
+    setRegisteredUser: (user) => dispatch(setRegistered({ user }))
+})
 
+const mapStateToProps = state => ({
+    formValues: getFormValues('signup')(state)
+})
 
 export const SignupPage = compose(
-    connect(null, mapDispatchToProps),
+    withRouter,
+    connect(mapStateToProps, mapDispatchToProps),
     reduxForm({
         form: 'signup',
         // asyncValidate: validator(schema)

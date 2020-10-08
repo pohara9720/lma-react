@@ -32,7 +32,7 @@ import './app-assets/css/colors.min.css'
 import './app-assets/css/components.min.css'
 import './app-assets/fonts/boxicons/css/boxicons.min.css'
 
-const middlewares = [logger];
+const middlewares = [];
 
 const store = createStore(rootReducer, initialState, applyMiddleware(...middlewares));
 

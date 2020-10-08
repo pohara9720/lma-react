@@ -25,6 +25,7 @@ import { ErrorBoundary } from '../molecules/ErrorBoundary';
 import { ErrorPage } from '../../pages/ErrorPage';
 import { ForgotPasswordPage } from '../../pages/ForgotPasswordPage';
 import { ChangePasswordPage } from '../../pages/ChangePasswordPage'
+import { ResendEmailPage } from '../../pages/ResendEmailPage'
 import { LMA_AUTH_TOKEN } from '../../dictionary';
 
 // const history = createBrowserHistory()
@@ -98,6 +99,9 @@ export const Routes = () => {
                     </Route>
                     <Route path="/login">
                         <LoginPage />
+                    </Route>
+                    <Route path="/resend-email">
+                        <ResendEmailPage />
                     </Route>
                     <Route path="/signup">
                         <SignupPage />

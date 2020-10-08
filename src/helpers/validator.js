@@ -22,7 +22,7 @@ export const validator = (schema) => async formValues => {
             [err.path]: err.message
         })
         const result = errors.inner.reduce(reducer, {})
-        console.log(result)
+        // console.log(result)
         throw result
     }
 }

@@ -3,7 +3,10 @@ import { Input } from '../../atoms/Input'
 import { Select } from '../../atoms/Select'
 import { states } from '../../../dictionary'
 
-export const PaymentStep = ({ errors }) => {
+export const PaymentStep = ({ errors, tier, values }) => {
+    const { name, annually, monthly, annualId } = tier || {}
+    const { subscription } = values
+    const value = subscription === annualId ? annually : monthly
     return (
         <fieldset>
             <div className="row review-section">
@@ -21,7 +24,7 @@ export const PaymentStep = ({ errors }) => {
                         <Input manualErrors={errors} label='CVC' type='number' name="payment_cvc" id="signup-payment-cvc" placeholder="Enter Your CVC" />
                     </div>
                     <br />
-                    <div className="col-md-12">
+                    {/* <div className="col-md-12">
                         <div className="form-group">
                             <div className="checkbox">
                                 <input type="checkbox" className="checkbox-input" id="checkbox7" />
@@ -29,7 +32,7 @@ export const PaymentStep = ({ errors }) => {
                             </div>
                         </div>
                     </div>
-                    <br />
+                    <br /> */}
                     <div className="col-12">
                         <Input manualErrors={errors} label='Street Address' name="payment_street" id="signup-payment-street" placeholder="Enter Your Street Address" />
                     </div>
@@ -53,15 +56,15 @@ export const PaymentStep = ({ errors }) => {
                         <div className="card-content">
                             <div className="card-body">
                                 <div className="d-flex justify-content-between mb-1">
-                                    <span>Standard Tier</span>
-                                    <span>$200.00</span>
+                                    <span>{name}</span>
+                                    <span>{value.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
                         <div className="card-footer">
                             <div className="d-flex align-self-end justify-content-between">
                                 <h3>Total</h3>
-                                <span>$200.00</span>
+                                <span>{(value + (value * .08)).toFixed(2)}</span>
                             </div>
                         </div>
                     </div>

@@ -58,7 +58,7 @@ export const ProfilePageRaw = ({ activeUser }) => {
             <div className="content-wrapper">
                 <BreadCrumbs />
                 <div className="content-body">
-                    <Tabs tabs={tabs} active={active} setActive={setActive} role='ADMIN' />
+                    <Tabs tabs={tabs} active={active} setActive={setActive} role={role} />
                     <div className="tab-content">
                         {page}
                     </div>

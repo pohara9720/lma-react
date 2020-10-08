@@ -1,7 +1,7 @@
 import { combineReducers } from "redux";
 import { animalReducer } from "./animals";
 import { companyReducer } from "./company";
-import { userReducer, activeUserReducer } from "./users";
+import { userReducer, activeUserReducer, registeredUserReducer } from "./users";
 import { inventoryReducer } from "./inventory";
 import { reducer as form } from 'redux-form';
 import { taskReducer } from "./tasks";
@@ -11,6 +11,7 @@ export const initState = {
     company: null,
     users: [],
     activeUser: null,
+    registeredUser: null,
     inventory: [],
     tasks: []
 }
@@ -22,6 +23,7 @@ export const rootReducer = combineReducers({
     activeUser: activeUserReducer,
     inventory: inventoryReducer,
     tasks: taskReducer,
+    registeredUser: registeredUserReducer,
     form
 });
 

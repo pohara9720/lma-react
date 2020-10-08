@@ -16,8 +16,8 @@ export const mapForCalendar = data => {
         [HEALTH]: '#39DA8A',
         [REPRODUCTION]: '#FF5B5C'
     }
-    return data.map(({ assigned_date, due_date, title, category }) =>
-        ({ title, start: assigned_date, end: due_date, color: colors[category] }))
+    return data.map(({ task_due_date, due_date, title, category }) =>
+        ({ title, start: task_due_date, end: task_due_date, color: colors[category] }))
 }
 
 const Calendar = ({ tasks }) =>

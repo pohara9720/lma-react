@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link, withRouter } from 'react-router-dom'
 import logo from '../app-assets/images/logo/logo.png'
 import { validator } from '../helpers/validator'
@@ -18,16 +18,25 @@ const schema = yup.object().shape({
 })
 
 export const LoginPageRaw = ({ handleSubmit, setActiveUser, history, loadCompany }) => {
+    const [error, setError] = useState(false)
 
     const onSubmit = async values => {
-        const { data: { user, token } } = await api.post('api-token-auth/', values)
-        if (user && token) {
-            const { company, ...rest } = user
-            localStorage.setItem(LMA_AUTH_TOKEN, token)
-            setActiveUser(rest)
-            loadCompany(company)
-            history.push(`/animals`)
+        try {
+            const { data: { user, token } } = await api.post('api-token-auth/', values)
+            if (user && token) {
+                const { company, ...rest } = user
+                localStorage.setItem(LMA_AUTH_TOKEN, token)
+                setActiveUser(rest)
+                loadCompany(company)
+                history.push(`/animals`)
+            }
+
+        } catch (error) {
+            if (error) {
+                setError(true)
+            }
         }
+
     }
 
     return (
@@ -56,21 +65,22 @@ export const LoginPageRaw = ({ handleSubmit, setActiveUser, history, loadCompany
                                                     </div>
                                                     <div className="card-content">
                                                         <div className="card-body">
-                                                            <form action="index.html">
+                                                            <div>
                                                                 <Input label='Email' name='email' className='form-group text-left' />
                                                                 <Input label='Password' type='password' name='password' className='form-group text-left' />
                                                                 <div className="form-group d-flex flex-md-row flex-column justify-content-between align-items-center">
                                                                     <Link to='/forgot-password'>
                                                                         <div className="text-right">
-                                                                            <a href="#" className="card-link"><small>Forgot your username or password?</small></a>
+                                                                            <div className="card-link"><small>Forgot your username or password?</small></div>
                                                                         </div>
                                                                     </Link>
                                                                 </div>
                                                                 <br />
+                                                                {error && <p style={{ color: 'red' }}>Credentials are invalid</p>}
                                                                 <div className="form-group text-left">
                                                                     <button type="submit" className="btn btn-primary glow w-45">Log In</button>
                                                                 </div>
-                                                            </form>
+                                                            </div>
                                                             <div className="text-left"><small className="mr-25">Don't have an account?</small>
                                                                 <Link to="/signup"><small>Sign up</small></Link>
                                                             </div>

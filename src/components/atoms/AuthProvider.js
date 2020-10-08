@@ -35,7 +35,7 @@ const AuthProviderRaw = ({
         if (!activeUser) {
             const fetch = async () => {
                 try {
-                    const { data } = await api.post('user/0/get_active_user/')
+                    const { data } = await api.post('user/get_active_user/')
                     const { company, ...user } = data
                     setActiveUser(user)
                     loadCompany(company)

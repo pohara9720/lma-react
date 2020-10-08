@@ -1,4 +1,3 @@
-import { unique } from './helpers/index'
 export const COW = 'COW'
 export const CATTLE = 'CATTLE'
 export const SHEEP = 'SHEEP'
@@ -30,6 +29,8 @@ export const HEALTH = 'HEALTH'
 export const REPRODUCTION = 'REPRODUCTION'
 export const ADMIN_ROLE = 'ADMIN'
 export const LMA_AUTH_TOKEN = 'LMA_AUTH_TOKEN'
+export const SEMEN = 'SEMEN'
+export const EMBRYO = 'EMBRYO'
 
 
 export const define = (dictionary = [], id) => {
@@ -59,8 +60,8 @@ export const animalOptions = [
 
 export const inventoryFilters = [
     { id: 'ALL_FILTERS', label: 'Filters' },
-    { id: 'SEMEN', label: 'Semen' },
-    { id: 'EMBRYO', label: 'Embryo' },
+    { id: SEMEN, label: 'Semen' },
+    { id: EMBRYO, label: 'Embryo' },
 ]
 
 export const inventoryOptions = [
