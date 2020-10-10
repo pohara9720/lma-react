@@ -16,7 +16,7 @@ export const mapForCalendar = data => {
         [HEALTH]: '#39DA8A',
         [REPRODUCTION]: '#FF5B5C'
     }
-    return data.map(({ task_due_date, due_date, title, category }) =>
+    return data.map(({ task_due_date, title, category }) =>
         ({ title, start: task_due_date, end: task_due_date, color: colors[category] }))
 }
 
@@ -27,6 +27,9 @@ const Calendar = ({ tasks }) =>
         startAccessor="start"
         endAccessor="end"
         style={{ height: 500 }}
+        selectable={false}
+        onDrillDown={() => { }}
+        popup
         eventPropGetter={event => ({ style: { backgroundColor: event.color } })}
     />
 

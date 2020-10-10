@@ -31,6 +31,8 @@ export const ADMIN_ROLE = 'ADMIN'
 export const LMA_AUTH_TOKEN = 'LMA_AUTH_TOKEN'
 export const SEMEN = 'SEMEN'
 export const EMBRYO = 'EMBRYO'
+export const LIVESTOCK = 'LIVESTOCK'
+export const INVENTORY = 'INVENTORY'
 
 
 export const define = (dictionary = [], id) => {
@@ -92,8 +94,8 @@ export const userOptions = [
 ]
 
 export const invoiceTypeOptions = [
-    { id: 'OPTION_1', label: 'Livestock', onClick: () => console.log('Hello') },
-    { id: 'OPTION_2', label: 'Inventory', onClick: () => console.log('Hello') }
+    { id: LIVESTOCK, label: 'Livestock' },
+    { id: INVENTORY, label: 'Inventory' }
 ]
 
 export const invoiceItemOptions = [

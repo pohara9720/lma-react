@@ -1,20 +1,20 @@
 import React from 'react'
 import { Link, withRouter } from 'react-router-dom'
-export const InvoiceActionsRaw = ({ match, onDownload, onSend, onSave }) => {
+export const InvoiceActionsRaw = ({ match, onDownload, disabled, creation }) => {
     return (
         <div className="col-xl-3 col-md-4 col-12">
             <div className="card invoice-action-wrapper shadow-none border">
                 <div className="card-body">
-                    {onSave ?
+                    {creation ?
                         <div className="invoice-action-btn">
-                            <button onClick={onSave} className="btn btn-light-primary btn-block">
+                            <button disabled={disabled} type='submit' className="btn btn-light-primary btn-block">
                                 <span>Save Invoice</span>
                             </button>
                         </div>
                         :
                         <div>
                             <div className="invoice-action-btn">
-                                <button onClick={onSend} className="btn btn-light-primary btn-block">
+                                <button disabled={disabled} type='submit' className="btn btn-light-primary btn-block">
                                     <span>Send Invoice</span>
                                 </button>
                             </div>

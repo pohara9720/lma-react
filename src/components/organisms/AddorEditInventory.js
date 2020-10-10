@@ -15,12 +15,12 @@ const schema = yup.object().shape({
     canister_number: yup.number().required('Canister Number is required'),
     top_id: yup.string().required('Top ID is required'),
     units: yup.number().required('Units is required'),
-    father: yup.string().required('Sire is required'),
-    mother: yup.string().required('Mother is required'),
+    father: yup.string().when('category', { is: s => s === SEMEN, then: s => s.required('Sire is required') }),
+    mother: yup.string().when('category', { is: s => s === EMBRYO, then: s => s.required('Dam is required') }),
 })
 
 
-export const AddorEditInventoryRaw = ({ formValues, onClose, handleSubmit, initialize, onSubmit }) => {
+export const AddorEditInventoryRaw = ({ formValues, onClose, handleSubmit, initialize, onSubmit, submitting }) => {
     const { animal_category, category } = formValues || {}
 
     useEffect(() => {
@@ -76,7 +76,7 @@ export const AddorEditInventoryRaw = ({ formValues, onClose, handleSubmit, initi
                 <div className="card-footer container">
                     <div className='row'>
                         <div className="col-xs-6">
-                            <button type='submit' className="btn btn-primary invoice-send-btn">
+                            <button disabled={submitting} type='submit' className="btn btn-primary invoice-send-btn">
                                 <span>Save Changes</span>
                             </button>
                         </div>

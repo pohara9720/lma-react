@@ -12,6 +12,8 @@ import { api } from '../helpers/api'
 import { connect } from 'react-redux'
 import { listAnimals } from '../redux/actions/animals'
 import { Link } from 'react-router-dom'
+import { compare } from '../helpers/index'
+import { setInvoiceItems } from '../redux/actions/invoiceItems'
 
 const columns = [
     {
@@ -40,7 +42,7 @@ const columns = [
 
 ]
 
-export const AnimalsPageRaw = ({ listAnimals, animals }) => {
+export const AnimalsPageRaw = ({ listAnimals, animals, setInvoiceItems }) => {
     const { Modal, toggle } = useModal()
     const { Table, selected } = useTable(animals, columns)
 
@@ -51,6 +53,12 @@ export const AnimalsPageRaw = ({ listAnimals, animals }) => {
         }
         fetch()
     }, [])
+
+    useEffect(() => {
+        const items = compare(selected, animals)
+        setInvoiceItems(items)
+    }, [selected])
+
 
     const onSubmit = async values => {
         let formData = new FormData();
@@ -86,7 +94,8 @@ export const AnimalsPageRaw = ({ listAnimals, animals }) => {
 const mapStateToProps = ({ animals }) => ({ animals })
 
 const mapDispathToProps = dispatch => ({
-    listAnimals: (animals) => dispatch(listAnimals({ animals }))
+    listAnimals: (animals) => dispatch(listAnimals({ animals })),
+    setInvoiceItems: (invoiceItems) => dispatch(setInvoiceItems({ invoiceItems }))
 })
 
 export const AnimalsPage = connect(mapStateToProps, mapDispathToProps)(AnimalsPageRaw)

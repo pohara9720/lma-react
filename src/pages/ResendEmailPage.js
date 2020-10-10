@@ -41,7 +41,7 @@ export const ResendEmailPageRaw = ({ registeredUser }) => {
                                                         <div className="card-body">
                                                             <div>
                                                                 <div className="form-group text-left">
-                                                                    <button onClick={onClick} className="btn btn-primary glow w-45">Resend Email</button>
+                                                                    <button disabled={!email} onClick={onClick} className="btn btn-primary glow w-45">Resend Email</button>
                                                                 </div>
                                                             </div>
                                                         </div>

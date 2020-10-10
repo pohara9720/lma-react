@@ -45,13 +45,15 @@ export const TasksPageRaw = ({ tasks, loadTasks }) => {
     }, [])
 
     const onSubmit = async values => {
-        const { animals, users, cost, ...rest } = values
-        const animalIds = animals.map(({ value }) => value)
+        const { animals, users, cost, breeding, ...rest } = values
+        const animalIds = animals && animals.map(({ value }) => value)
         const userIds = users.map(({ value }) => value)
+        const breedingValue = !breeding ? null : breeding.map(({ breeding_selection, ...rest }) => ({ breeding_selection: JSON.parse(breeding_selection), ...rest }))
         const payload = {
             users: userIds,
             animals: animalIds,
             cost: cost ? price(cost) : 0,
+            breeding: breedingValue,
             ...rest
         }
         const { data } = await api.post('task/', payload)

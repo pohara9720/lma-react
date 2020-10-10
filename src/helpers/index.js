@@ -18,3 +18,9 @@ export const unique = a => {
         return seen.hasOwnProperty(item) ? false : (seen[item] = true);
     });
 }
+
+export const compare = (ids, dict) => {
+    let objs = []
+    dict && dict.map(item => ids.includes(item.id) ? objs.push(item) : null)
+    return objs
+}

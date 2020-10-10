@@ -46,7 +46,6 @@ const Attachment = ({ input, meta: { touched, error } }) => {
 
 
 const HeaderAvatar = ({ input, meta: { touched, error } }) => {
-    console.log(error)
     const [preview, setPreview] = useState(null)
     const onInputChange = (e) => {
         e.preventDefault();
@@ -75,7 +74,6 @@ const HeaderAvatar = ({ input, meta: { touched, error } }) => {
     )
 }
 const ProfileAvatar = ({ input, meta: { touched, error } }) => {
-    console.log(error)
     const [preview, setPreview] = useState(null)
     const onInputChange = (e) => {
         e.preventDefault();
@@ -87,7 +85,6 @@ const ProfileAvatar = ({ input, meta: { touched, error } }) => {
     };
     const onClick = id => {
         const el = document.getElementById(id)
-        console.log(el)
         el.click()
     }
     return (

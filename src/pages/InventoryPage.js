@@ -10,6 +10,9 @@ import { useTable } from '../hooks/useTable'
 import { loadInventory } from '../redux/actions/inventory'
 import { api } from '../helpers/api'
 import { BulletLabel } from '../components/atoms/BulletLabel'
+import { setInvoiceItems } from '../redux/actions/invoiceItems'
+import { compare } from '../helpers/index'
+
 
 const columns = [
     {
@@ -19,12 +22,12 @@ const columns = [
     {
         label: 'Sire',
         name: 'father',
-        render: (({ father: { tag_number, name } }) => <div>{`${name} (Tag# ${tag_number})`}</div>)
+        render: (({ father }) => father ? <div>{`${father.name} (Tag# ${father.tag_number})`}</div> : 'N/A')
     },
     {
         label: 'Dam',
         name: 'mother',
-        render: (({ mother: { tag_number, name } }) => <div>{`${name} (Tag# ${tag_number})`}</div>)
+        render: (({ mother }) => mother ? <div>{`${mother.name} (Tag# ${mother.tag_number})`}</div> : 'N/A')
     },
     {
         label: 'Tank #',
@@ -44,7 +47,7 @@ const columns = [
     },
 ]
 
-export const InventoryPageRaw = ({ inventory, loadInventory }) => {
+export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems }) => {
     const { Modal, toggle } = useModal()
     const { selected, Table } = useTable(inventory, columns)
 
@@ -55,6 +58,11 @@ export const InventoryPageRaw = ({ inventory, loadInventory }) => {
         }
         fetch()
     }, [])
+
+    useEffect(() => {
+        const items = compare(selected, inventory)
+        setInvoiceItems(items)
+    }, [selected])
 
     const onSubmit = async values => {
         const { data } = await api.post('inventory/', values)
@@ -84,7 +92,8 @@ export const InventoryPageRaw = ({ inventory, loadInventory }) => {
 
 const mapStateToProps = ({ inventory }) => ({ inventory })
 const mapDispatchToProps = dispatch => ({
-    loadInventory: (inventory) => dispatch(loadInventory({ inventory }))
+    loadInventory: (inventory) => dispatch(loadInventory({ inventory })),
+    setInvoiceItems: (invoiceItems) => dispatch(setInvoiceItems({ invoiceItems }))
 })
 
 

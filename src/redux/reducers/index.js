@@ -5,6 +5,8 @@ import { userReducer, activeUserReducer, registeredUserReducer } from "./users";
 import { inventoryReducer } from "./inventory";
 import { reducer as form } from 'redux-form';
 import { taskReducer } from "./tasks";
+import { saleReducer } from "./sales";
+import { invoiceItemReducer } from "./invoiceItems";
 
 export const initState = {
     animals: [],
@@ -13,7 +15,9 @@ export const initState = {
     activeUser: null,
     registeredUser: null,
     inventory: [],
-    tasks: []
+    tasks: [],
+    sales: [],
+    invoiceItems: []
 }
 
 export const rootReducer = combineReducers({
@@ -23,7 +27,9 @@ export const rootReducer = combineReducers({
     activeUser: activeUserReducer,
     inventory: inventoryReducer,
     tasks: taskReducer,
+    sales: saleReducer,
     registeredUser: registeredUserReducer,
+    invoiceItems: invoiceItemReducer,
     form
 });
 

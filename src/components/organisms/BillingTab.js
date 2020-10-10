@@ -8,10 +8,11 @@ import { connect } from 'react-redux'
 import { validator } from '../../helpers/validator'
 import { compose } from 'recompose'
 import { api } from '../../helpers/api'
+import moment from 'moment'
 
 const schema = yup.object().shape({
     name: yup.string().required('Name on card is required'),
-    number: yup.number().required('Card number is required'),
+    number: yup.number().typeError('Card number must be a number').required('Card number is required'),
     expiration: yup.date().required('Expiration data is required'),
     cvc: yup.number().required('CVC is required'),
     street: yup.string().required('Name on card is required'),
@@ -25,15 +26,19 @@ export const BillingTabRaw = ({ company, initialize, handleSubmit }) => {
 
     useEffect(() => {
         const fetch = async () => {
-            const { data } = await api.get(`/company/${payment_info}/get_stripe_account`)
-            console.log(data)
+            const { data } = await api.get(`company/${payment_info}/get_stripe_account`)
+            const { name, address, last4, exp_month, exp_year } = data || {}
+            const { street, city, state, zipcode } = address || {}
+            const expiration = moment([exp_year, exp_month, 1]).format('YYYY-MM-DD')
+            initialize({ street, city, state, zipcode, name, expiration, number: `**** **** **** ${last4}` })
         }
         fetch()
     }, [payment_info])
 
     const onSubmit = async values => {
-        const { data } = await api.post(`/company/${payment_info}/update_stripe_account`, values)
-        console.log(data)
+        console.log(values)
+        // const { data } = await api.post(`company/${payment_info}/update_stripe_account`, values)
+        // console.log(data)
     }
 
     return (
@@ -46,7 +51,7 @@ export const BillingTabRaw = ({ company, initialize, handleSubmit }) => {
                             <Input label='Name on Card' placeholder='Name on Card' name='name' />
                         </div>
                         <div className="form-group">
-                            <Input label='Card Number' placeholder='Card Number' name='number' type='number' />
+                            <Input label='Card Number' placeholder='Card Number' name='number' />
                         </div>
                         <div className="row">
                             <div className="col-md-6">

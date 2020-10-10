@@ -5,7 +5,7 @@ import { TableHeaderActions } from '../molecules/TableHeaderActions'
 import { userOptions } from '../../dictionary'
 import { useModal } from '../../hooks/useModal'
 import { Input } from '../atoms/Input'
-import { reduxForm, FieldArray, Field } from 'redux-form'
+import { reduxForm, FieldArray } from 'redux-form'
 import { emailFieldArrayValidator as validate } from '../../helpers/validator'
 import { api } from '../../helpers/api'
 import { listUsers } from '../../redux/actions/users'
@@ -79,7 +79,6 @@ const ModalContentRaw = ({ initialize, handleSubmit, onSubmit, ...rest }) => {
 const ModalContent = reduxForm({ form: 'companyUserForm', validate })(ModalContentRaw)
 
 export const ManageUsersTabRaw = ({ loadUsers, users, company }) => {
-    const { id: companyId } = company || {}
     const onDelete = async id => {
         const result = await api.delete(`user/${id}`)
         const state = users.filter((user) => user.id !== id)

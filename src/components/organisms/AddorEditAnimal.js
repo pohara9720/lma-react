@@ -31,8 +31,7 @@ const schema = yup.object().shape({
     attachment: fileSchema
 })
 
-export const AddorEditAnimalRaw = ({ formValues, onClose, handleSubmit, onSubmit }) => {
-
+export const AddorEditAnimalRaw = ({ formValues, onClose, handleSubmit, onSubmit, submitting }) => {
     const { type } = formValues || {}
     const subtypes = animalSubTypes[type] || []
 
@@ -80,7 +79,7 @@ export const AddorEditAnimalRaw = ({ formValues, onClose, handleSubmit, onSubmit
             <div className="card-footer container">
                 <div className="row">
                     <div className="col-xs-6">
-                        <button type='submit' className="btn btn-primary invoice-send-btn">
+                        <button disabled={submitting} type='submit' className="btn btn-primary invoice-send-btn">
                             <span>Save Changes</span>
                         </button>
                     </div>

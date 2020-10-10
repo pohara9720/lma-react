@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { reduxForm, getFormValues, FieldArray, change } from 'redux-form'
 import { validator } from '../../helpers/validator'
 import { toMulti } from '../../helpers/index'
@@ -12,6 +12,7 @@ import { connect } from 'react-redux'
 import { compose } from 'recompose'
 import styled from 'styled-components'
 import moment from 'moment'
+import { api } from '../../helpers/api'
 
 const Icon = styled.div`
     border-radius:8px;
@@ -36,25 +37,21 @@ const schema = yup.object().shape({
     task_due_date: yup.string().required('Task due date is required'),
     description: yup.string().required('Description is required'),
     users: yup.array().of(yup.string()).required('At least 1 user must be selected'),
-    breeding: yup.array().of(breedingObj).required(),
     // conditionals
+    breeding: yup.array().of(breedingObj).when('category', { is: c => c === BREEDING, then: s => s.required('Breeding sets are required') }),
     animals: yup.array().of(yup.string()).when('category', { is: c => c !== BREEDING, then: s => s.required('At least 1 animal must be selected') }),
     due_date: yup.string().when('category', { is: c => c === BREEDING, then: s => s.required('Animal due date is required') }), //ONLY BREEDING
     cost: yup.number().when('category', { is: c => c !== BREEDING, then: s => s.required('Cost is required') }), //EVERYTHING BUT BREEDING
-    // .when('category', { is: c => c !== OTHER, then: s => s.required() }), //EVERYTHING BUT OTHER
 })
 
-const Breeding = ({ fields }) => {
-    // const [sperm, setSperm] = useState([])
-    // const { breeding } = formValues
-    // useEffect(() => {
-    //     effect
-    //     return () => {
-    //         cleanup
-    //     }
-    // }, [breeding])
-    const test = [{ id: '123', type: 'inventory', label: 'Inventory Item' }, { id: '1234', type: 'animal', label: 'Animal Item' }]
-    const render = (item) => <option value={JSON.stringify(item)}>{item.label}</option>
+const Breeding = ({ fields, options }) => {
+    const { females, semen } = options || {}
+    const renderFemales = (({ id, name, tag_number }) => <option key={id} value={id}>{`${name} (${tag_number})`}</option>)
+    const renderSemen = (({ id, type, father, tag_number }) => {
+        const itemType = type ? 'animal' : 'inventory'
+        const tagValue = type ? `Tag# ${tag_number}(Animal)` : `Tag# ${father.tag_number} (Semen)`
+        return <option key={id} value={JSON.stringify({ id, type: itemType })}>{tagValue}</option>
+    })
     return (
         <div>
             {
@@ -63,10 +60,10 @@ const Breeding = ({ fields }) => {
                         <div key={i}>
                             <div className='row'>
                                 <div className='form-group col-5'>
-                                    <Select options={taskCategories} name={`${item}.female_select`} label='Female' />
+                                    <Select render={renderFemales} options={females} name={`${item}.female_select`} label='Female' />
                                 </div>
                                 <div className='form-group col-5'>
-                                    <Select options={test} name={`${item}.breeding_selection`} label='Male or Semen' render={render} />
+                                    <Select render={renderSemen} options={semen} name={`${item}.breeding_selection`} label='Male or Semen' />
                                 </div>
                                 <div className='col-2'>
                                     <Icon onClick={() => fields.remove(i)}>
@@ -85,12 +82,13 @@ const Breeding = ({ fields }) => {
     )
 }
 
-export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, users, onSubmit, initialize, dispatch, ...rest }) => {
+export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, users, onSubmit, initialize, dispatch, submitting, ...rest }) => {
     const { category, breeding_type, task_due_date } = formValues || {}
     const isBreeding = category === BREEDING
     const isActive = users.filter(({ is_active }) => is_active === true)
     const userOptions = toMulti(isActive, (({ first_name, last_name }) => `${first_name} ${last_name}`))
     const animalOptions = toMulti(animals, (({ tag_number, name }) => `${name} (Tag# ${tag_number})`))
+    const [breedingData, setBreedingData] = useState([])
 
     const getDueDate = date => {
         switch (breeding_type) {
@@ -104,11 +102,16 @@ export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, u
     }
 
     useEffect(() => {
+        const fetch = async () => {
+            const { data } = await api.post('inventory/get_breeding_sets/', { type: breeding_type })
+            setBreedingData(data)
+        }
         if (isBreeding) {
             const due_date = getDueDate(task_due_date)
             const breeding = [{}]
             dispatch(change('taskForm', 'breeding', breeding))
             dispatch(change('taskForm', 'due_date', due_date))
+            fetch()
         }
     }, [task_due_date, breeding_type])
 
@@ -153,19 +156,24 @@ export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, u
                     </div>
                 </div>
                 <div className="card-body border-bottom task-description">
-                    <div className='form-group'>
-                        <Select options={animalTypes} name='breeding_type' label='Type of Animal to be bred' />
-                    </div>
-                    <ul className="list-unstyled">
-                        {
-                            isBreeding && breeding_type && <FieldArray name="breeding" component={Breeding} />
-                        }
-                    </ul>
+                    {
+                        isBreeding &&
+                        <div className='form-group'>
+                            <Select options={animalTypes} name='breeding_type' label='Type of Animal to be bred' />
+                        </div>
+                    }
+                    {
+                        isBreeding && breeding_type &&
+                        <ul className="list-unstyled">
+                            <FieldArray name="breeding" component={Breeding} options={breedingData} />
+
+                        </ul>
+                    }
                 </div>
                 <div className="card-footer container">
                     <div className="row">
                         <div className="col-xs-6">
-                            <button type='submit' className="btn btn-primary invoice-send-btn">
+                            <button type='submit' disabled={submitting} className="btn btn-primary invoice-send-btn">
                                 <span>Save Changes</span>
                             </button>
                         </div>

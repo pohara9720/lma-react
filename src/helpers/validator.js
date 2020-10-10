@@ -1,6 +1,6 @@
 import * as yup from 'yup'
 
-const SUPPORTED = ['image/jpg', ' image/jpeg', 'image/png', '.pdf', '.csv']
+const SUPPORTED = ['image/jpg', 'image/jpeg', 'image/png', 'application/pdf', 'application/csv']
 export const fileSchema = yup.mixed()
     .test(
         "fileSize",
@@ -9,7 +9,7 @@ export const fileSchema = yup.mixed()
     ).test(
         "fileFormat",
         "Unsupported File type",
-        value => !value || value && SUPPORTED.includes(value.type)
+        value => !value || (value && SUPPORTED.includes(value.type))
     )
 
 export const validator = (schema) => async formValues => {
@@ -22,7 +22,6 @@ export const validator = (schema) => async formValues => {
             [err.path]: err.message
         })
         const result = errors.inner.reduce(reducer, {})
-        // console.log(result)
         throw result
     }
 }
@@ -49,5 +48,76 @@ export const emailFieldArrayValidator = ({ emails }) => {
             errors.emails = emailErrors
         }
     }
+    console.log('ERRORS EMAILS', errors)
     return errors
 }
+
+export const saleValidator = values => {
+    const { invoice_items } = values
+    let errors = {}
+    const schema = yup.object().shape({
+        number: yup.number().required('Invoice Number is required'),
+        issue_date: yup.date().required('Issue date is required'),
+        due_date: yup.date().required('Due date is required'),
+        title: yup.string().required('Title is required'),
+        bill_to_name: yup.string().required('Bill to name is required'),
+        bill_to_address: yup.string().required('Bill to address is required'),
+        bill_to_email: yup.string().email().required('Bill to email is required'),
+        phone: yup.number().required('Phone number is required')
+    })
+    try {
+        schema.validateSync(values, { abortEarly: false })
+    } catch (e) {
+        const reducer = (errs, err) => ({
+            ...errs,
+            [err.path]: err.message
+        })
+        const result = e.inner.reduce(reducer, {})
+        errors = result
+    }
+    if (!invoice_items || !invoice_items.length) {
+        errors.invoice_items = { _error: 'Invoice must have at least 1 line item' }
+    } else {
+        const invoiceErrors = []
+        invoice_items.forEach((invoiceItem, index) => {
+            const { type, item, cost, quantity, description } = invoiceItem || {}
+            if (!type || typeof type !== 'string') {
+                invoiceErrors[index] = { type: 'Valid type is required' }
+            }
+            if (!item || typeof item !== 'string') {
+                invoiceErrors[index] = { item: 'Invoice item is required' }
+            }
+            if (!cost || typeof cost !== 'string') {
+                invoiceErrors[index] = { cost: 'Cost is required' }
+            }
+            if (!quantity || typeof quantity !== 'string') {
+                invoiceErrors[index] = { quantity: 'Quantity is required' }
+            }
+            if (!description || typeof description !== 'string') {
+                invoiceErrors[index] = { description: 'Small description is required' }
+            }
+        })
+        if (invoiceErrors.length) {
+            errors.invoice_items = invoiceErrors
+        }
+    }
+    return errors
+}
+
+// export const saleValidator = ({
+//     bill_to_name,
+//     bill_to_address,
+//     bill_to_email,
+//     issue_date,
+//     due_date,
+//     number,
+//     phone,
+//     invoiceItems
+// }) => {
+//     const errors = {}
+//     if (!bill_to_name) {
+//         schema.validateSync(23)
+//         errors.bill_to_name = { _error: 'Name is required' }
+//     }
+//     return errors
+// }
