@@ -11,30 +11,33 @@ import { StatusBubble } from '../components/atoms/StatusBubble'
 import { api } from '../helpers/api'
 import { loadSales } from '../redux/actions/sales'
 import { connect } from 'react-redux'
-import { compare } from '../helpers/index'
+import { compare, readDate } from '../helpers/index'
+import { PageWrapper } from '../components/atoms/PageWrapper'
 
 export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
     const columns = [
         {
             label: 'Invoice #',
-            name: 'invoice'
+            name: 'number'
         },
         {
-            label: 'Amount',
-            name: 'amount',
+            label: 'Amount due (USD)',
+            name: 'total',
+            render: (({ total }) => total.toFixed(2))
         },
         {
             label: 'Date',
-            name: 'date'
+            name: 'due_date',
+            render: (({ due_date }) => readDate(due_date))
         },
         {
             label: 'Customer',
-            name: 'customer',
-
+            name: 'bill_to_name',
         },
         {
-            label: 'Tags',
-            name: 'tags',
+            label: '# of Items',
+            name: 'items',
+            render: (({ items }) => items.length)
         },
         {
             label: 'Status',
@@ -43,6 +46,12 @@ export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
         },
     ]
     const { Table, selected } = useTable(sales, columns)
+
+    const searchConfig = {
+        entity: 'sale',
+        keys: ['bill_to_name'],
+        setter: loadSales
+    }
 
     useEffect(() => {
         const fetch = async () => {
@@ -53,21 +62,17 @@ export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
         fetch()
     }, [])
 
-
     return (
-        <div className="app-content content">
-            <div className="content-overlay"></div>
-            <div className="content-wrapper">
-                <BreadCrumbs />
-                <div className="content-body">
-                    <section className="invoice-list-wrapper">
-                        <PageHeaderActions title='Create Sale' onAdd={() => history.push(`${match.url}/manage-invoice`)} onExport='sale' />
-                        <TableHeaderActions options={invoiceOptions} filters={invoiceFilters} />
-                        <Table />
-                    </section>
-                </div>
+        <PageWrapper>
+            <BreadCrumbs />
+            <div className="content-body">
+                <section className="invoice-list-wrapper">
+                    <PageHeaderActions title='Create Sale' onAdd={() => history.push(`${match.url}/manage-invoice`)} onExport='sale' />
+                    <TableHeaderActions searchConfig={searchConfig} options={invoiceOptions} filters={invoiceFilters} />
+                    <Table />
+                </section>
             </div>
-        </div>
+        </PageWrapper>
     )
 }
 

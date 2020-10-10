@@ -10,6 +10,7 @@ import { loadTasks } from '../redux/actions/tasks'
 import { api } from '../helpers/api'
 import { price } from '../helpers/index'
 import { FEED, REPRODUCTION, BREEDING, OTHER, HEALTH } from '../dictionary'
+import { PageWrapper } from '../components/atoms/PageWrapper'
 
 export const TasksPageRaw = ({ tasks, loadTasks }) => {
     const { toggle, Modal } = useModal()
@@ -62,24 +63,21 @@ export const TasksPageRaw = ({ tasks, loadTasks }) => {
     }
 
     return (
-        <div className="app-content content">
-            <div className="content-overlay"></div>
-            <div className="content-wrapper">
-                <BreadCrumbs />
-                <div className="content-body">
-                    <section className="invoice-list-wrapper">
-                        <PageHeaderActions title='New Task' onAdd={toggle} />
-                        <div className='tasks-container-p'>
-                            <TodoSidebar active={active} onClick={onFilterClick} />
-                            <Todos tasks={filtered} />
-                        </div>
-                    </section>
-                    <Modal actionless title='New Task' onClose={toggle}>
-                        <AddorEditTask onClose={toggle} onSubmit={onSubmit} />
-                    </Modal>
-                </div>
+        <PageWrapper fullScreen>
+            <BreadCrumbs />
+            <div className="content-body">
+                <section className="invoice-list-wrapper">
+                    <PageHeaderActions title='New Task' onAdd={toggle} />
+                    <div className='tasks-container-p'>
+                        <TodoSidebar active={active} onClick={onFilterClick} />
+                        <Todos tasks={filtered} />
+                    </div>
+                </section>
+                <Modal actionless title='New Task' onClose={toggle}>
+                    <AddorEditTask onClose={toggle} onSubmit={onSubmit} />
+                </Modal>
             </div>
-        </div>
+        </PageWrapper>
     )
 }
 

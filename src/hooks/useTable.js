@@ -19,3 +19,4 @@ export const useTable = (data, columns) => {
     }
     return { selected: checked, Table }
 }
+

@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { FEED, BREEDING, OTHER, HEALTH, REPRODUCTION } from '../../dictionary'
+import { StatusBubble } from './StatusBubble'
 
 export const TodoItem = ({ item }) => {
     const [checked, setChecked] = useState(item.completed)
-    const { title, category } = item
+    const { title, category, completed } = item
 
     const colors = {
         [FEED]: 'primary',
@@ -28,13 +29,11 @@ export const TodoItem = ({ item }) => {
                     <p className="todo-title mx-50 m-0 truncate">{title}</p>
                 </div>
                 <div className="todo-item-action d-flex align-items-center">
-                    <div>
+                    <div style={{ marginRight: 8 }}>
                         <span className={`bullet bullet-sm bullet-${colors[category]}`} style={{ marginRight: 8 }}></span>
                         <span>{category}</span>
                     </div>
-                    {/* <div className="avatar ml-1">
-                        <img src={logo} alt="avatar" height="30" width="30" />
-                    </div> */}
+                    <StatusBubble color={completed ? colors.HEALTH : colors[REPRODUCTION]} status={completed ? 'Completed' : 'Not completed'} />
                     <a className='todo-item-delete ml-75'><i className="bx bx-trash"></i></a>
                 </div>
             </div>

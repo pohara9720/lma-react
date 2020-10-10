@@ -1,3 +1,6 @@
+import { listAnimals } from "./redux/actions/animals"
+import { api } from './helpers/api'
+
 export const COW = 'COW'
 export const CATTLE = 'CATTLE'
 export const SHEEP = 'SHEEP'
@@ -43,35 +46,64 @@ export const define = (dictionary = [], id) => {
     return found.label
 }
 
-export const animalFilters = [
-    { id: 'ALL_FILTERS', label: 'Filter', onClick: () => console.log('Hello') },
-    { id: 'ALL_SHEEP', label: 'All Sheep', onClick: () => console.log('Hello') },
-    { id: 'ALL_PIGS', label: 'All Pigs', onClick: () => console.log('Hello') },
-    { id: 'ALL_HORSES', label: 'All Horses', onClick: () => console.log('Hello') },
-    { id: 'ALL_GOATS', label: 'All Goats', onClick: () => console.log('Hello') },
-]
+export const animalFilters = (listAnimals) => {
+    const onClick = async (category) => {
+        if (category) {
+            const { data } = await api.get(`animal/${category}/by_type`)
+            listAnimals(data)
+        }
+        else {
+            const { data } = await api.get('animal')
+            listAnimals(data?.results)
+        }
+    }
+    return [
+        { id: 'ALL_FILTERS', label: 'Filter', onClick: () => onClick() },
+        { id: 'ALL_CATTLE', label: 'All Cattle', onClick: () => onClick(CATTLE) },
+        { id: 'ALL_SHEEP', label: 'All Sheep', onClick: () => onClick(SHEEP) },
+        { id: 'ALL_PIGS', label: 'All Pigs', onClick: () => onClick(PIG) },
+        { id: 'ALL_HORSES', label: 'All Horses', onClick: () => onClick(HORSE) },
+        { id: 'ALL_GOATS', label: 'All Goats', onClick: () => onClick(GOAT) },
+    ]
+}
 
-export const animalOptions = [
-    { id: 'ALL_OPTIONS', label: 'Options', onClick: () => console.log('Hello') },
-    { id: 'CREATE_SALE', label: 'Create Sale', onClick: () => console.log('Hello') },
-    { id: 'CHANGE_CATEGORY', label: 'Change Category', onClick: () => console.log('Hello') },
-    { id: 'ASSIGN_TASKS', label: 'Assign Tasks', onClick: () => console.log('Hello') },
-    { id: 'DELETE_ANIMALS', label: 'Delete Animals', onClick: () => console.log('Hello'), isDelete: true },
-]
+
+export const animalOptions = (onCreateSale, onAssign, onDelete) => {
+    return [
+        { id: 'ALL_OPTIONS', label: 'Options', onClick: () => { } },
+        { id: 'CREATE_SALE', label: 'Create Sale', onClick: onCreateSale },
+        { id: 'ASSIGN_TASKS', label: 'Assign Tasks', onClick: onAssign },
+        { id: 'DELETE_ANIMALS', label: 'Delete Animals', onClick: onDelete, isDelete: true },
+    ]
+}
 
 
-export const inventoryFilters = [
-    { id: 'ALL_FILTERS', label: 'Filters' },
-    { id: SEMEN, label: 'Semen' },
-    { id: EMBRYO, label: 'Embryo' },
-]
+export const inventoryFilters = (loadInventory) => {
+    const onClick = async (category) => {
+        if (category) {
+            const { data } = await api.get(`inventory/${category}/by_type`)
+            loadInventory(data)
+        }
+        else {
+            const { data } = await api.get('inventory')
+            loadInventory(data)
+        }
+    }
+    return [
+        { id: 'ALL_FILTERS', label: 'Filters', onClick: () => onClick() },
+        { id: SEMEN, label: 'Semen', onClick: () => onClick(SEMEN) },
+        { id: EMBRYO, label: 'Embryo', onClick: () => onClick(EMBRYO) },
+    ]
+}
 
-export const inventoryOptions = [
-    { id: 'ALL_OPTIONS', label: 'Options', onClick: () => console.log('Hello') },
-    { id: 'CREATE_SALE', label: 'Create Sale', onClick: () => console.log('Hello') },
-    { id: 'ASSIGN_TASKS', label: 'Assign Tasks', onClick: () => console.log('Hello') },
-    { id: 'DELETE_ANIMALS', label: 'Delete Inventory', onClick: () => console.log('Hello'), isDelete: true },
-]
+export const inventoryOptions = (onCreateSale, onAssign, onDelete) => {
+    return [
+        { id: 'ALL_OPTIONS', label: 'Options', onClick: () => { } },
+        { id: 'CREATE_SALE', label: 'Create Sale', onClick: onCreateSale },
+        { id: 'ASSIGN_TASKS', label: 'Assign Tasks', onClick: onAssign },
+        { id: 'DELETE_ANIMALS', label: 'Delete Inventory', onClick: onDelete, isDelete: true },
+    ]
+}
 
 export const invoiceFilters = [
     { id: 'ALL_FILTERS', label: 'Filters', onClick: () => console.log('Hello') },

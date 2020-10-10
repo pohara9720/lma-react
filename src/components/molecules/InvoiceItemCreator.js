@@ -3,7 +3,7 @@ import React, {
 } from 'react'
 import { Select } from '../atoms/Select'
 import { Input } from '../atoms/Input'
-import { invoiceTypeOptions, INVENTORY } from '../../dictionary'
+import { invoiceTypeOptions, INVENTORY, LIVESTOCK } from '../../dictionary'
 import { FieldArray } from 'redux-form'
 
 const InvoiceItem = ({ fields, meta: { error }, animals, inventory, formValues, changeFieldValue }) => {
@@ -12,7 +12,7 @@ const InvoiceItem = ({ fields, meta: { error }, animals, inventory, formValues, 
     return (
         <div>
             {fields.map((field, i) => {
-                const { type, cost, quantity, item } = invoice_items[i] || {}
+                const { type, cost, quantity, item } = invoice_items && invoice_items[i] || {}
                 const found = inventory.find(x => x.id === item)
                 const itemSelection = type === INVENTORY ? inventory : animals
                 const total = Number.isNaN((cost * quantity)) ? 0 : (cost * quantity).toFixed(2)
@@ -91,7 +91,20 @@ const InvoiceItem = ({ fields, meta: { error }, animals, inventory, formValues, 
 export const InvoiceItemCreator = ({ initialize, inventory, animals, invoiceItems, formValues, changeFieldValue }) => {
 
     useEffect(() => {
-        initialize({ invoice_items: [{ type: INVENTORY }] })
+        if (invoiceItems.length) {
+            const mapToForm = ({ type, cost, quantity, id }) => ({
+                type: type ? type === LIVESTOCK : INVENTORY,
+                cost,
+                quantity,
+                item: id
+            })
+            const invoice_items = invoiceItems.map(mapToForm)
+            console.log('ITEMS', invoice_items)
+            initialize({ invoice_items })
+        } else {
+            initialize({ invoice_items: [{ type: INVENTORY }] })
+        }
+
     }, [])
 
     return (

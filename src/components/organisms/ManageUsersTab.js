@@ -78,7 +78,7 @@ const ModalContentRaw = ({ initialize, handleSubmit, onSubmit, ...rest }) => {
 
 const ModalContent = reduxForm({ form: 'companyUserForm', validate })(ModalContentRaw)
 
-export const ManageUsersTabRaw = ({ loadUsers, users, company }) => {
+export const ManageUsersTabRaw = ({ loadUsers, users }) => {
     const onDelete = async id => {
         const result = await api.delete(`user/${id}`)
         const state = users.filter((user) => user.id !== id)
@@ -130,6 +130,12 @@ export const ManageUsersTabRaw = ({ loadUsers, users, company }) => {
     const { toggle, Modal } = useModal()
     const { Table } = useTable(users, columns)
 
+    const searchConfig = {
+        entity: 'user',
+        keys: ['first_name', 'last_name'],
+        setter: loadUsers
+    }
+
     useEffect(() => {
         const fetch = async () => {
             const { data: init } = await api.get('user')
@@ -149,7 +155,7 @@ export const ManageUsersTabRaw = ({ loadUsers, users, company }) => {
         <div className="tab-pane fade active show" aria-labelledby="users-tab" role="tabpanel">
             <section className="invoice-list-wrapper">
                 <PageHeaderActions onAdd={toggle} title='Add User' />
-                <TableHeaderActions options={userOptions} />
+                <TableHeaderActions searchConfig={searchConfig} options={userOptions} />
                 <Table />
             </section>
             <Modal title='Add Users' onClose={toggle} actionless>

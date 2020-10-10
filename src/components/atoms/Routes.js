@@ -113,7 +113,7 @@ export const Routes = () => {
                         <ChangePasswordPage />
                     </Route>
                     <Route path="*">
-                        <ErrorPage />
+                        <ErrorPage is404 />
                     </Route>
                     <Redirect exact from='/' to='/animals' />
                 </Switch>

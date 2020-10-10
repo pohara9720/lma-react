@@ -11,9 +11,11 @@ import { BulletLabel } from '../components/atoms/BulletLabel'
 import { api } from '../helpers/api'
 import { connect } from 'react-redux'
 import { listAnimals } from '../redux/actions/animals'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import { compare } from '../helpers/index'
 import { setInvoiceItems } from '../redux/actions/invoiceItems'
+import { PageWrapper } from '../components/atoms/PageWrapper'
+import { compose } from 'recompose'
 
 const columns = [
     {
@@ -42,9 +44,15 @@ const columns = [
 
 ]
 
-export const AnimalsPageRaw = ({ listAnimals, animals, setInvoiceItems }) => {
+export const AnimalsPageRaw = ({ listAnimals, animals, setInvoiceItems, history, match }) => {
     const { Modal, toggle } = useModal()
     const { Table, selected } = useTable(animals, columns)
+
+    const searchConfig = {
+        entity: 'animal',
+        keys: ['name', 'tag_number'],
+        setter: listAnimals
+    }
 
     useEffect(() => {
         const fetch = async () => {
@@ -54,11 +62,23 @@ export const AnimalsPageRaw = ({ listAnimals, animals, setInvoiceItems }) => {
         fetch()
     }, [])
 
-    useEffect(() => {
+    const onCreateSale = () => {
         const items = compare(selected, animals)
         setInvoiceItems(items)
-    }, [selected])
+        history.push('/sales/manage-invoice')
+    }
 
+    const onAssign = () => {
+        console.log(selected)
+    }
+
+    const onDelete = () => {
+        if (!selected.length) {
+            return null
+        } else {
+            console.log(selected)
+        }
+    }
 
     const onSubmit = async values => {
         let formData = new FormData();
@@ -72,22 +92,19 @@ export const AnimalsPageRaw = ({ listAnimals, animals, setInvoiceItems }) => {
     }
 
     return (
-        <div className="app-content content">
-            <div className="content-overlay"></div>
-            <div className="content-wrapper">
-                <BreadCrumbs />
-                <div className="content-body">
-                    <section className="invoice-list-wrapper">
-                        <PageHeaderActions title='Add Animal' onAdd={toggle} onExport='animal' />
-                        <TableHeaderActions options={animalOptions} filters={animalFilters} />
-                        <Table />
-                    </section>
-                    <Modal actionless title='Add Animal' onClose={toggle}>
-                        <AddorEditAnimal onClose={toggle} onSubmit={onSubmit} />
-                    </Modal>
-                </div>
+        <PageWrapper>
+            <BreadCrumbs />
+            <div className="content-body">
+                <section className="invoice-list-wrapper">
+                    <PageHeaderActions title='Add Animal' onAdd={toggle} onExport='animal' />
+                    <TableHeaderActions searchConfig={searchConfig} options={animalOptions(onCreateSale, onAssign, onDelete)} filters={animalFilters(listAnimals)} />
+                    <Table />
+                </section>
+                <Modal actionless title='Add Animal' onClose={toggle}>
+                    <AddorEditAnimal onClose={toggle} onSubmit={onSubmit} />
+                </Modal>
             </div>
-        </div>
+        </PageWrapper>
     )
 }
 
@@ -98,4 +115,7 @@ const mapDispathToProps = dispatch => ({
     setInvoiceItems: (invoiceItems) => dispatch(setInvoiceItems({ invoiceItems }))
 })
 
-export const AnimalsPage = connect(mapStateToProps, mapDispathToProps)(AnimalsPageRaw)
+export const AnimalsPage = compose(
+    withRouter,
+    connect(mapStateToProps, mapDispathToProps)
+)(AnimalsPageRaw)

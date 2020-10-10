@@ -12,7 +12,9 @@ import { api } from '../helpers/api'
 import { BulletLabel } from '../components/atoms/BulletLabel'
 import { setInvoiceItems } from '../redux/actions/invoiceItems'
 import { compare } from '../helpers/index'
-
+import { PageWrapper } from '../components/atoms/PageWrapper'
+import { withRouter } from 'react-router-dom'
+import { compose } from 'recompose'
 
 const columns = [
     {
@@ -47,9 +49,15 @@ const columns = [
     },
 ]
 
-export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems }) => {
+export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems, history }) => {
     const { Modal, toggle } = useModal()
     const { selected, Table } = useTable(inventory, columns)
+
+    const searchConfig = {
+        entity: 'inventory',
+        keys: ['top_id', 'tank_number'],
+        setter: loadInventory
+    }
 
     useEffect(() => {
         const fetch = async () => {
@@ -59,10 +67,23 @@ export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems }) 
         fetch()
     }, [])
 
-    useEffect(() => {
+    const onCreateSale = () => {
         const items = compare(selected, inventory)
         setInvoiceItems(items)
-    }, [selected])
+        history.push('/sales/manage-invoice')
+    }
+
+    const onAssign = () => {
+        console.log(selected)
+    }
+
+    const onDelete = () => {
+        if (!selected.length) {
+            return null
+        } else {
+            console.log(selected)
+        }
+    }
 
     const onSubmit = async values => {
         const { data } = await api.post('inventory/', values)
@@ -71,22 +92,19 @@ export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems }) 
     }
 
     return (
-        <div className="app-content content">
-            <div className="content-overlay"></div>
-            <div className="content-wrapper">
-                <BreadCrumbs />
-                <div className="content-body">
-                    <section className="invoice-list-wrapper">
-                        <PageHeaderActions title='Add Inventory' onAdd={toggle} onExport='inventory' />
-                        <TableHeaderActions options={inventoryOptions} filters={inventoryFilters} />
-                        <Table />
-                    </section>
-                    <Modal actionless title='Add Inventory' onClose={toggle}>
-                        <AddorEditInventory onClose={toggle} onSubmit={onSubmit} />
-                    </Modal>
-                </div>
+        <PageWrapper>
+            <BreadCrumbs />
+            <div className="content-body">
+                <section className="invoice-list-wrapper">
+                    <PageHeaderActions title='Add Inventory' onAdd={toggle} onExport='inventory' />
+                    <TableHeaderActions searchConfig={searchConfig} options={inventoryOptions(onCreateSale, onAssign, onDelete)} filters={inventoryFilters(loadInventory)} />
+                    <Table />
+                </section>
+                <Modal actionless title='Add Inventory' onClose={toggle}>
+                    <AddorEditInventory onClose={toggle} onSubmit={onSubmit} />
+                </Modal>
             </div>
-        </div>
+        </PageWrapper>
     )
 }
 
@@ -97,4 +115,7 @@ const mapDispatchToProps = dispatch => ({
 })
 
 
-export const InventoryPage = connect(mapStateToProps, mapDispatchToProps)(InventoryPageRaw)
+export const InventoryPage = compose(
+    withRouter,
+    connect(mapStateToProps, mapDispatchToProps)
+)(InventoryPageRaw)

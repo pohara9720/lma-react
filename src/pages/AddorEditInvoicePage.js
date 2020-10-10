@@ -6,7 +6,7 @@ import { InvoiceItemCreator } from '../components/molecules/InvoiceItemCreator'
 import { Input } from '../components/atoms/Input'
 import { TextArea } from '../components/atoms/TextArea'
 import { reduxForm, getFormValues } from 'redux-form'
-import * as yup from 'yup'
+import { withRouter } from 'react-router-dom'
 import { api } from '../helpers/api'
 import { connect } from 'react-redux'
 import { compose } from 'recompose'
@@ -21,16 +21,24 @@ export const AddorEditInvoicePageRaw = ({
     inventory,
     submitting,
     formValues,
+    history,
     ...rest
 }) => {
 
-    const onSubmit = async values => {
-        console.log(values)
-    }
 
     const reducer = (A, C) => (C?.cost * C?.quantity) + A
     const total = formValues?.invoice_items.reduce(reducer, 0)
     const totalValue = Number.isNaN(total) ? '-' : total && total.toFixed(2)
+
+    const onSubmit = async values => {
+        const [total] = totalValue.split('.')
+        const payload = {
+            ...values,
+            total
+        }
+        await api.post('sale/', payload)
+        history.push('/sales')
+    }
 
     return (
 
@@ -150,10 +158,11 @@ const mapStateToProps = ({ invoiceItems, animals, inventory, ...state }) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    changeFieldValue: (value, i, field) => dispatch(change('invoiceForm', `invoice_items.[${i}].${field}`, value)),
+    changeFieldValue: (value, i, field) => dispatch(change('invoiceForm', `invoice_items.[${i}].${field}`, value))
 })
 
 export const AddorEditInvoicePage = compose(
+    withRouter,
     connect(mapStateToProps, mapDispatchToProps),
     reduxForm({ form: 'invoiceForm', validate })
 )(AddorEditInvoicePageRaw)

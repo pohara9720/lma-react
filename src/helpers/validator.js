@@ -81,13 +81,14 @@ export const saleValidator = values => {
         const invoiceErrors = []
         invoice_items.forEach((invoiceItem, index) => {
             const { type, item, cost, quantity, description } = invoiceItem || {}
+            console.log(typeof cost, cost)
             if (!type || typeof type !== 'string') {
                 invoiceErrors[index] = { type: 'Valid type is required' }
             }
             if (!item || typeof item !== 'string') {
                 invoiceErrors[index] = { item: 'Invoice item is required' }
             }
-            if (!cost || typeof cost !== 'string') {
+            if (!cost) {
                 invoiceErrors[index] = { cost: 'Cost is required' }
             }
             if (!quantity || typeof quantity !== 'string') {
