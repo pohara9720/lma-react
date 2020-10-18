@@ -1,8 +1,8 @@
 import React from 'react'
+import { connect } from 'react-redux'
 
-
-export const Modal = ({ open, onClose, children, title, onSubmit, actionless }) => {
-    const className = open ? 'sidebar-overlay show' : 'sidebar-overlay'
+export const ModalRaw = ({ open, onClose, children, title, onSubmit, actionless, taskModalOpen }) => {
+    const className = open || taskModalOpen ? 'sidebar-overlay show' : 'sidebar-overlay'
     return (
         <>
             <div className={className} onClick={onClose}></div>
@@ -42,3 +42,6 @@ export const Modal = ({ open, onClose, children, title, onSubmit, actionless }) 
         </>
     )
 }
+
+const mapStateToProps = ({ taskModalOpen }) => ({ taskModalOpen })
+export const Modal = connect(mapStateToProps, null)(ModalRaw)

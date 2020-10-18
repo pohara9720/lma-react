@@ -1,6 +1,6 @@
 import React from 'react'
-import { Link, withRouter } from 'react-router-dom'
-export const InvoiceActionsRaw = ({ match, onDownload, disabled, creation }) => {
+
+export const InvoiceActions = ({ onDownload, onSend, disabled, creation }) => {
     return (
         <div className="col-xl-3 col-md-4 col-12">
             <div className="card invoice-action-wrapper shadow-none border">
@@ -14,7 +14,7 @@ export const InvoiceActionsRaw = ({ match, onDownload, disabled, creation }) => 
                         :
                         <div>
                             <div className="invoice-action-btn">
-                                <button disabled={disabled} type='submit' className="btn btn-light-primary btn-block">
+                                <button onClick={onSend} disabled={disabled} type='submit' className="btn btn-light-primary btn-block">
                                     <span>Send Invoice</span>
                                 </button>
                             </div>
@@ -23,11 +23,11 @@ export const InvoiceActionsRaw = ({ match, onDownload, disabled, creation }) => 
                                     <span>Download</span>
                                 </button>
                             </div>
-                            <div className="invoice-action-btn">
+                            {/* <div className="invoice-action-btn">
                                 <Link to={`/sales/manage-invoice`} href="invoice-edit.html" className="btn btn-light-primary btn-block">
                                     <span>Edit Invoice</span>
                                 </Link>
-                            </div>
+                            </div> */}
                         </div>
                     }
                 </div>
@@ -35,5 +35,3 @@ export const InvoiceActionsRaw = ({ match, onDownload, disabled, creation }) => 
         </div>
     )
 }
-
-export const InvoiceActions = withRouter(InvoiceActionsRaw)

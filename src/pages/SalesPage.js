@@ -1,24 +1,24 @@
 import React, { useEffect } from 'react'
 import { BreadCrumbs } from '../components/molecules/BreadCrumbs'
 import { PageHeaderActions } from '../components/molecules/PageHeaderActions'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { TableHeaderActions } from '../components/molecules/TableHeaderActions'
-import { invoiceFilters, invoiceOptions } from '../dictionary'
+import { invoiceFilters, invoiceOptions, UNPAID } from '../dictionary'
 import { compose } from 'recompose'
-import { withSales } from '../hoc/withSales'
 import { useTable } from '../hooks/useTable'
 import { StatusBubble } from '../components/atoms/StatusBubble'
 import { api } from '../helpers/api'
 import { loadSales } from '../redux/actions/sales'
 import { connect } from 'react-redux'
-import { compare, readDate } from '../helpers/index'
+import { compare, readDate, displayToast } from '../helpers/index'
 import { PageWrapper } from '../components/atoms/PageWrapper'
 
 export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
     const columns = [
         {
             label: 'Invoice #',
-            name: 'number'
+            name: 'number',
+            render: (({ id, number }) => <Link to={`sales/${id}`}> {number}</Link>)
         },
         {
             label: 'Amount due (USD)',
@@ -42,25 +42,48 @@ export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
         {
             label: 'Status',
             name: 'status',
-            render: (({ status }) => <StatusBubble status={status} />)
+            render: (({ status }) => <StatusBubble status={status} color={status === 'PAID' ? 'success' : 'danger'} />)
         },
     ]
-    const { Table, selected } = useTable(sales, columns)
+    const { Table, selected, page, clear } = useTable(sales, columns)
 
     const searchConfig = {
         entity: 'sale',
-        keys: ['bill_to_name'],
         setter: loadSales
+    }
+
+    const onSend = async () => {
+        try {
+            const invoices = compare(selected, sales?.results).map(({ email, id }) => ({ id, email }))
+            await api.post('sale/resend_invoices/', { invoices })
+            displayToast({ success: true })
+        } catch (error) {
+
+        }
+    }
+
+    const onPaid = async () => {
+        try {
+            const invoices = compare(selected, sales?.results).filter(({ status }) => status === UNPAID)
+            if (invoices.length) {
+                await api.post('sale/change_to_paid/', { invoices })
+                const { data: init } = await api.get(`sale/?page=${page}`)
+                loadSales(init)
+            }
+            clear()
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
     }
 
     useEffect(() => {
         const fetch = async () => {
-            const { data: init } = await api.get('sale')
-            console.log('INIT', init)
+            const { data: init } = await api.get(`sale/?page=${page}`)
             loadSales(init)
         }
         fetch()
-    }, [])
+    }, [page])
 
     return (
         <PageWrapper>
@@ -68,7 +91,7 @@ export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
             <div className="content-body">
                 <section className="invoice-list-wrapper">
                     <PageHeaderActions title='Create Sale' onAdd={() => history.push(`${match.url}/manage-invoice`)} onExport='sale' />
-                    <TableHeaderActions searchConfig={searchConfig} options={invoiceOptions} filters={invoiceFilters} />
+                    <TableHeaderActions searchConfig={searchConfig} options={invoiceOptions(onSend, onPaid)} filters={invoiceFilters(loadSales)} closeOnly />
                     <Table />
                 </section>
             </div>

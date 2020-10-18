@@ -8,6 +8,7 @@ export const MultiSelectInputRaw = ({
     displayField,
     label,
     meta: { touched, error },
+    defaultValue = [],
     ...rest
 }) => {
     const [state, setState] = useState([])
@@ -17,13 +18,19 @@ export const MultiSelectInputRaw = ({
         input.onChange(option, state)
     }
 
+    useEffect(() => {
+        if (defaultValue) {
+            setState(defaultValue)
+        }
+    }, [defaultValue])
+
     return (
         <>
             {label && <label>{label}</label>}
             <Select
                 {...input}
                 value={state}
-                defaultValue={[]}
+                defaultValue={defaultValue}
                 options={options}
                 onChange={onChange}
                 onBlur={() => state}

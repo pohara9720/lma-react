@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 
-export const ActionDropdown = ({ options }) => {
+export const ActionDropdown = ({ options, closeOnly }) => {
     const [active, setActive] = useState(options[0])
     const [open, setOpen] = useState(false)
 
     const onAction = (option) => {
-        setActive(option)
+        if (!closeOnly) {
+            setActive(option)
+        }
         setOpen(false)
         option.onClick(option)
     }

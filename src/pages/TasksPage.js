@@ -6,14 +6,14 @@ import { AddorEditTask } from '../components/organisms/AddorEditTask'
 import { TodoSidebar } from '../components/molecules/TodoSidebar'
 import { Todos } from '../components/organisms/Todos'
 import { connect } from 'react-redux'
-import { loadTasks } from '../redux/actions/tasks'
+import { loadTasks, setTaskModal } from '../redux/actions/tasks'
 import { api } from '../helpers/api'
-import { price } from '../helpers/index'
+import { displayToast, price } from '../helpers/index'
 import { FEED, REPRODUCTION, BREEDING, OTHER, HEALTH } from '../dictionary'
 import { PageWrapper } from '../components/atoms/PageWrapper'
 
-export const TasksPageRaw = ({ tasks, loadTasks }) => {
-    const { toggle, Modal } = useModal()
+export const TasksPageRaw = ({ tasks, loadTasks, taskModalOpen, setTaskModal }) => {
+    const { toggle, Modal } = useModal(taskModalOpen)
     const [active, setActive] = useState('All Tasks')
     const [filtered, setFiltered] = useState(tasks)
 
@@ -46,20 +46,31 @@ export const TasksPageRaw = ({ tasks, loadTasks }) => {
     }, [])
 
     const onSubmit = async values => {
-        const { animals, users, cost, breeding, ...rest } = values
-        const animalIds = animals && animals.map(({ value }) => value)
-        const userIds = users.map(({ value }) => value)
-        const breedingValue = !breeding ? null : breeding.map(({ breeding_selection, ...rest }) => ({ breeding_selection: JSON.parse(breeding_selection), ...rest }))
-        const payload = {
-            users: userIds,
-            animals: animalIds,
-            cost: cost ? price(cost) : 0,
-            breeding: breedingValue,
-            ...rest
+        try {
+            const { animals, users, cost, breeding, ...rest } = values
+            const animalIds = animals && animals.map(({ value }) => value)
+            const userIds = users.map(({ value }) => value)
+            const breedingValue = !breeding ? null : breeding.map(({ breeding_selection, ...rest }) => ({ breeding_selection: JSON.parse(breeding_selection), ...rest }))
+            const payload = {
+                users: userIds,
+                animals: animalIds,
+                cost: cost ? price(cost) : 0,
+                breeding: breedingValue,
+                ...rest
+            }
+            const { data } = await api.post('task/', payload)
+            loadTasks([data, ...filtered])
+            toggle()
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
         }
-        const { data } = await api.post('task/', payload)
-        loadTasks([data, ...filtered])
+
+    }
+
+    const onClose = () => {
         toggle()
+        setTaskModal(false)
     }
 
     return (
@@ -73,18 +84,19 @@ export const TasksPageRaw = ({ tasks, loadTasks }) => {
                         <Todos tasks={filtered} />
                     </div>
                 </section>
-                <Modal actionless title='New Task' onClose={toggle}>
-                    <AddorEditTask onClose={toggle} onSubmit={onSubmit} />
+                <Modal actionless title='New Task' onClose={onClose}>
+                    <AddorEditTask onClose={onClose} onSubmit={onSubmit} />
                 </Modal>
             </div>
         </PageWrapper>
     )
 }
 
-const mapStateToProps = ({ tasks }) => ({ tasks })
+const mapStateToProps = ({ tasks, taskModalOpen }) => ({ tasks, taskModalOpen })
 
 const mapDispathToProps = dispatch => ({
-    loadTasks: (tasks) => dispatch(loadTasks({ tasks }))
+    loadTasks: (tasks) => dispatch(loadTasks({ tasks })),
+    setTaskModal: (boolean) => dispatch(setTaskModal(boolean))
 })
 
 export const TasksPage = connect(mapStateToProps, mapDispathToProps)(TasksPageRaw)

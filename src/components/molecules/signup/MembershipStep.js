@@ -1,4 +1,13 @@
 import React, { useState, useEffect } from 'react'
+import styled from 'styled-components'
+
+const CardContainer = styled.div`
+    display:grid;
+  grid-template-columns: 1fr 1fr;
+  grid-row: auto auto;
+  grid-column-gap: 20px;
+  grid-row-gap: 20px;
+`
 
 const MembershipCards = ({ active, setActive, options }) => {
 
@@ -10,29 +19,34 @@ const MembershipCards = ({ active, setActive, options }) => {
         cursor: disabled ? 'not-allowed' : 'pointer',
         ...font(monthlyId, annualId)
     })
-    return options.map(({ monthlyId, annualId, members, name, price, features, disabled }, i) =>
-        <div onClick={() => disabled ? null : setActive(options[i])} key={i} className="swiper-slide rounded swiper-shadow py-1 px-3" style={style(monthlyId, annualId, disabled)}>
-            <div className="d-flex justify-content-center py-1">
-                <h4 style={font(monthlyId, annualId)} className="swiper-text">{members}</h4>
-            </div>
-            <div className="d-flex justify-content-center mt-2">
-                <h1 style={font(monthlyId, annualId)} className="swiper-text">{name}</h1>
-            </div>
-            <div className="d-flex justify-content-center mb-2">
-                <span style={font(monthlyId, annualId)} className="swiper-text">{price}</span>
-            </div>
-            <ul className="d-flex align-self-end list-group">
-                {
-                    features.map((feature, j) =>
-                        <li style={font(monthlyId, annualId,)} key={j} className="list-group-item border-none d-flex justify-content-center align-items-center py-0">
-                            <span><i className='swiper-text bx bx-check'></i></span>
-                            <span className="swiper-text">{feature}</span>
-                        </li>
-                    )
-                }
-            </ul>
-        </div>
+    return (
+        <CardContainer>
+            {options.map(({ monthlyId, annualId, members, name, price, features, disabled }, i) =>
+                <div onClick={() => disabled ? null : setActive(options[i])} key={i} className="swiper-slide rounded swiper-shadow py-1 px-3" style={style(monthlyId, annualId, disabled)}>
+                    <div className="d-flex justify-content-center py-1">
+                        <h4 style={font(monthlyId, annualId)} className="swiper-text">{members}</h4>
+                    </div>
+                    <div className="d-flex justify-content-center mt-2">
+                        <h1 style={font(monthlyId, annualId)} className="swiper-text">{name}</h1>
+                    </div>
+                    <div className="d-flex justify-content-center mb-2">
+                        <span style={font(monthlyId, annualId)} className="swiper-text">{price}</span>
+                    </div>
+                    <ul className="d-flex align-self-end list-group">
+                        {
+                            features.map((feature, j) =>
+                                <li style={font(monthlyId, annualId,)} key={j} className="list-group-item border-none d-flex justify-content-center align-items-center py-0">
+                                    <span><i className='swiper-text bx bx-check'></i></span>
+                                    <span className="swiper-text">{feature}</span>
+                                </li>
+                            )
+                        }
+                    </ul>
+                </div>
+            )}
+        </CardContainer>
     )
+
 }
 
 

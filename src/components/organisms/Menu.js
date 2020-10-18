@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import image from '../../app-assets/images/logo/lma-logo.png'
 import { Link, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
+import { compose } from 'recompose'
+import { connect } from 'react-redux'
 
 const Avatar = styled.div`
     height:40px;
@@ -15,10 +17,12 @@ const Avatar = styled.div`
 `
 
 
-export const MenuRaw = ({ match, history }) => {
+export const MenuRaw = ({ match, history, activeUser, company }) => {
     const { url } = match
     const [active, setActive] = useState(url)
     const [isOpen, setIsOpen] = useState(false)
+    const { first_name, last_name } = activeUser || {}
+    const { name } = company || {}
 
     useEffect(() => {
         setActive(url)
@@ -70,8 +74,8 @@ export const MenuRaw = ({ match, history }) => {
                                 <li className="dropdown dropdown-user nav-item">
                                     <a className="dropdown-toggle nav-link dropdown-user-link" data-toggle="dropdown">
                                         <div className="user-nav d-sm-flex d-none">
-                                            <span className="user-name">Tyler Humphrey</span>
-                                            <span className="user-status text-muted">Humphrey Show Cattle</span>
+                                            <span className="user-name">{first_name} {last_name}</span>
+                                            <span className="user-status text-muted">{name}</span>
                                         </div>
                                         <span>
                                             <Avatar />
@@ -155,4 +159,9 @@ export const MenuRaw = ({ match, history }) => {
     )
 }
 
-export const Menu = withRouter(MenuRaw)
+const mapStateToProps = ({ activeUser, company }) => ({ activeUser, company })
+
+export const Menu = compose(
+    withRouter,
+    connect(mapStateToProps, null)
+)(MenuRaw)

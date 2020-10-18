@@ -7,7 +7,7 @@ import { Input } from '../atoms/Input'
 import { TextArea } from '../atoms/TextArea'
 import { MultiSelect } from '../atoms/MultiSelect'
 import * as yup from 'yup'
-import { taskCategories, BREEDING, animalTypes, CATTLE, PIG, SHEEP, HORSE, GOAT } from '../../dictionary'
+import { taskCategories, BREEDING, animalTypes, CATTLE, PIG, SHEEP, HORSE, GOAT, FEED } from '../../dictionary'
 import { connect } from 'react-redux'
 import { compose } from 'recompose'
 import styled from 'styled-components'
@@ -82,13 +82,26 @@ const Breeding = ({ fields, options }) => {
     )
 }
 
-export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, users, onSubmit, initialize, dispatch, submitting, ...rest }) => {
+export const AddorEditTaskRaw = ({ formValues,
+    onClose,
+    handleSubmit,
+    animals,
+    users,
+    onSubmit,
+    initialize,
+    dispatch,
+    submitting,
+    taskItems,
+    ...rest
+}) => {
     const { category, breeding_type, task_due_date } = formValues || {}
     const isBreeding = category === BREEDING
     const isActive = users.filter(({ is_active }) => is_active === true)
     const userOptions = toMulti(isActive, (({ first_name, last_name }) => `${first_name} ${last_name}`))
     const animalOptions = toMulti(animals, (({ tag_number, name }) => `${name} (Tag# ${tag_number})`))
     const [breedingData, setBreedingData] = useState([])
+    const [defaultUsers, setDefaultUsers] = useState([])
+    const [defaultAnimals, setDefaultAnimals] = useState([])
 
     const getDueDate = date => {
         switch (breeding_type) {
@@ -100,6 +113,35 @@ export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, u
             default: return moment(date).add(283, 'days').format('YYYY-MM-DD')
         }
     }
+
+    useEffect(() => {
+        if (taskItems && taskItems.length) {
+            let u = []
+            let a = []
+            let i = []
+            const mapToForm = (({ type, first_name, last_name, id, tank_number, name, tag_number }) => {
+                if (type) {
+                    a.push({ label: `${name} (Tag# ${tag_number})`, value: id })
+                }
+                if (first_name) {
+                    u.push({ label: `${first_name} ${last_name}`, value: id })
+                }
+                if (tank_number) {
+                    i.push({ id, tank_number })
+                }
+            })
+            taskItems.map(mapToForm)
+            if (a.length) {
+                setDefaultAnimals(a)
+            }
+            if (u.length) {
+                setDefaultUsers(u)
+            }
+            if (i.length) {
+                initialize({ category: BREEDING })
+            }
+        }
+    }, [])
 
     useEffect(() => {
         const fetch = async () => {
@@ -143,12 +185,12 @@ export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, u
                         }
                     </div>
                     <div className="form-group">
-                        <MultiSelect options={userOptions} placeholder='Select Users' name='users' label='Users Assigned To' />
+                        <MultiSelect defaultValue={defaultUsers} options={userOptions} placeholder='Select Users' name='users' label='Users Assigned To' />
                     </div>
                     {
                         !isBreeding &&
                         <div className="form-group">
-                            <MultiSelect options={animalOptions} placeholder='Select Animals' name='animals' label='Animals Assigned To' />
+                            <MultiSelect defaultValue={defaultAnimals} options={animalOptions} placeholder='Select Animals' name='animals' label='Animals Assigned To' />
                         </div>
                     }
                     <div className='form-group'>
@@ -192,8 +234,9 @@ export const AddorEditTaskRaw = ({ formValues, onClose, handleSubmit, animals, u
 
 export const AddorEditTask = compose(
     connect(state => ({
-        animals: state.animals,
-        users: state.users,
+        animals: state.animals.results,
+        users: state.users.results,
+        taskItems: state.taskItems,
         formValues: getFormValues('taskForm')(state)
     })),
     reduxForm({ form: 'taskForm', asyncValidate: validator(schema) }))(AddorEditTaskRaw)

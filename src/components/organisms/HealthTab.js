@@ -25,9 +25,12 @@ export const HealthTab = ({ tasks }) => (
             <div className="card-content">
                 <div className="card-body">
                     <h4 className="card-title">Activity</h4>
-                    <ul className="widget-timeline">
-                        {tasks.map((t, i) => <TimelineItem key={i} {...t} />)}
-                    </ul>
+                    {
+                        !tasks.length ? <div>No Health Information</div> :
+                            <ul className="widget-timeline">
+                                {tasks.map((t, i) => <TimelineItem key={i} {...t} />)}
+                            </ul>
+                    }
                 </div>
             </div>
         </div>

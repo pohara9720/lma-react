@@ -2,55 +2,52 @@ import React, { useEffect } from 'react'
 import { Select } from '../atoms/Select'
 import { states } from '../../dictionary'
 import { Input } from '../atoms/Input'
-import { reduxForm } from 'redux-form'
+import { reduxForm, reset } from 'redux-form'
 import * as yup from 'yup'
 import { validator } from '../../helpers/validator'
 import { connect } from 'react-redux'
 import { compose } from 'recompose'
 import { api } from '../../helpers/api'
+import { displayToast } from '../../helpers'
 
 const passwordSchema = yup.object().shape({
-    new_password: yup.string().required('new password is required'),
-    old_password: yup.string().required('old password is required'),
-    new_password_confirm: yup
+    password: yup.string().required('New password is required'),
+    password_confirm: yup
         .string()
         .test('match',
-            'emails do not match',
-            function (new_password_confirm) {
-                return new_password_confirm === this.parent.new_password;
-            }),
-    old_password_confirm: yup
-        .string()
-        .test('match',
-            'emails do not match',
-            function (old_password_confirm) {
-                return old_password_confirm === this.parent.old_password;
-            }),
+            'Passwords do not match',
+            function (password_confirm) {
+                return password_confirm === this.parent.password;
+            })
 })
 
-const PasswordComp = ({ handleSubmit }) => {
 
-    const onSubmit = (values) => {
-        console.log(values)
+const PasswordComp = ({ handleSubmit, clearFields, dispatch, ...rest }) => {
+    console.log(rest)
+
+    const onSubmit = async (values) => {
+        const { password } = values
+        try {
+            await api.post('user/change_password/', { password })
+            dispatch(reset('passwordForm'))
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
     }
+
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className='row' style={{ marginTop: 32 }}>
                 <div className="col-md-6">
                     <div className="form-group">
-                        <Input label='Old Password' placeholder='Password' name='old_password' type='password' />
-                    </div>
-                    <div className="form-group">
-                        <Input label='Confirm Old Password' placeholder='Confirm Password' name='old_password_confirm' type='password' />
+                        <Input label='New Password' placeholder='Password' name='password' type='password' />
                     </div>
                 </div>
                 <div className="col-md-6">
                     <div className="form-group">
-                        <Input label='New Password' placeholder='Password' name='new_password' type='password' />
-                    </div>
-                    <div className="form-group">
-                        <Input label='Confirm New Password' placeholder='Confirm Password' name='new_password_confirm' type='password' />
+                        <Input label='Confirm New Password' placeholder='Confirm Password' name='password_confirm' type='password' />
                     </div>
                 </div>
             </div>
@@ -82,8 +79,12 @@ const ProfileFormRaw = ({ handleSubmit, initialize, activeUser }) => {
     }, [email, first_name, last_name, address])
 
     const onSubmit = async (values) => {
-        const { data } = await api.patch(`user/${id}/`, values)
-        console.log('DATA', values)
+        try {
+            await api.patch(`user/${id}/`, values)
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
     }
     return (
         <form onSubmit={handleSubmit(onSubmit)}>

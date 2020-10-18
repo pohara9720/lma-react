@@ -10,7 +10,8 @@ const PieContainer = styled.div`
 `
 
 
-export const ProfitTab = () => {
+export const ProfitTab = ({ expenses }) => {
+    console.log(expenses)
     const myData = [{ angle: 1, label: 'Label', color: 'yellow' }, { angle: 2, label: 'Label', color: 'blue' }, { angle: 3, label: 'Label', color: 'red' }]
     return (
         <div className="tab-pane pl-0" id="profitability" aria-labelledby="profitability-tab" role="tabpanel">

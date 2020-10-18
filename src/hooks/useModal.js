@@ -27,8 +27,8 @@ export const ModalComponent = ({ children, ...rest }) => {
     )
 }
 
-export const useModal = () => {
-    const [open, setOpen] = useState(false)
+export const useModal = (taskModalOpen = false) => {
+    const [open, setOpen] = useState(taskModalOpen)
     const toggle = () => setOpen(!open)
     const Modal = ({ children, ...rest }) =>
         <ModalComponent toggle={toggle} open={open} {...rest}>{children}</ModalComponent>

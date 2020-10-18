@@ -9,6 +9,8 @@ export const AnimalInfo = ({ animal }) => {
         dob,
         father,
         mother,
+        father_placeholder,
+        mother_placeholder,
         attachment,
         header_image = cow,
         profile_image = cow
@@ -40,11 +42,11 @@ export const AnimalInfo = ({ animal }) => {
                             </div>
                             <div className="d-flex justify-content-between mb-1">
                                 <span>Sire</span>
-                                <span>{father?.name || father}</span>
+                                <span>{father?.name || father_placeholder || 'N/A'}</span>
                             </div>
                             <div className="d-flex justify-content-between mb-1">
                                 <span>Dam</span>
-                                <span>{mother?.name || mother}</span>
+                                <span>{mother?.name || mother_placeholder || 'N/A'}</span>
                             </div>
                             <div className="d-flex justify-content-between mb-1">
                                 <span><i className="bx bxs-file-pdf"></i></span>

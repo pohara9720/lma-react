@@ -1,8 +1,11 @@
 import React from 'react'
+import { BREEDING } from '../../dictionary'
 import { TimelineItem } from './HealthTab'
-
+import { readDate } from '../../helpers/index'
 
 export const BreedingTab = ({ tasks }) => {
+    const breeding = tasks.find(({ category }) => category === BREEDING)
+    const { task_due_date, due_date, ...rest } = breeding || {}
     return (
         <div className="tab-pane active" id="breeding" aria-labelledby="breeding-tab" role="tabpanel">
             <div className="card border">
@@ -11,11 +14,11 @@ export const BreedingTab = ({ tasks }) => {
                         <h4 className="card-title">Breeding Details</h4>
                         <div className="d-flex justify-content-between mb-1">
                             <span>Bred Date</span>
-                            <span>05/20/2020</span>
+                            <span>{task_due_date ? readDate(task_due_date) : 'N/A'}</span>
                         </div>
                         <div className="d-flex justify-content-between mb-1">
                             <span>Due Date</span>
-                            <span>05/20/2020</span>
+                            <span>{due_date ? readDate(due_date) : 'N/A'}</span>
                         </div>
                         <div className="d-flex justify-content-between mb-1">
                             <span>Bred To</span>

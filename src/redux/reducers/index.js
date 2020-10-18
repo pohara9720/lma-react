@@ -1,10 +1,10 @@
 import { combineReducers } from "redux";
-import { animalReducer } from "./animals";
+import { animalReducer, editAnimalReducer } from "./animals";
 import { companyReducer } from "./company";
 import { userReducer, activeUserReducer, registeredUserReducer } from "./users";
-import { inventoryReducer } from "./inventory";
+import { inventoryReducer, editInventoryReducer } from "./inventory";
 import { reducer as form } from 'redux-form';
-import { taskReducer } from "./tasks";
+import { taskReducer, taskModalReducer, taskItemReducer } from "./tasks";
 import { saleReducer } from "./sales";
 import { invoiceItemReducer } from "./invoiceItems";
 
@@ -17,7 +17,11 @@ export const initState = {
     inventory: [],
     tasks: [],
     sales: [],
-    invoiceItems: []
+    invoiceItems: [],
+    taskModalOpen: false,
+    taskItems: [],
+    editAnimal: null,
+    editInventory: null
 }
 
 export const rootReducer = combineReducers({
@@ -30,6 +34,10 @@ export const rootReducer = combineReducers({
     sales: saleReducer,
     registeredUser: registeredUserReducer,
     invoiceItems: invoiceItemReducer,
+    taskModalOpen: taskModalReducer,
+    taskItems: taskItemReducer,
+    editAnimal: editAnimalReducer,
+    editInventory: editInventoryReducer,
     form
 });
 

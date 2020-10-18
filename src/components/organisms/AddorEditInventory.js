@@ -20,21 +20,38 @@ const schema = yup.object().shape({
 })
 
 
-export const AddorEditInventoryRaw = ({ formValues, onClose, handleSubmit, initialize, onSubmit, submitting }) => {
+export const AddorEditInventoryRaw = ({
+    formValues,
+    onClose,
+    onEdit,
+    editInventory,
+    handleSubmit,
+    initialize,
+    onSubmit,
+    submitting
+}) => {
     const { animal_category, category } = formValues || {}
+    const isEdit = !!editInventory
 
     useEffect(() => {
-        initialize({ category: EMBRYO })
+        if (isEdit) {
+            const { category, cost, tank_number, canister_number, top_id, units, animal_category, father, mother } = editInventory || {}
+            initialize({ category, cost, tank_number, canister_number, top_id, units, animal_category, father: father?.id || 'N/A', mother: mother?.id || 'N/A' })
+        } else {
+            initialize({ category: EMBRYO })
+        }
     }, [])
 
+    const Submission = isEdit ? v => onEdit(v, editInventory.id) : onSubmit
+
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(Submission)}>
             <div className="card-content collapse show" aria-expanded="true">
                 <div className="tab-content mt-1 pl-0">
                     <div className="tab-pane container active" id="details" aria-labelledby="details-tab" role="tabpanel">
                         <div className="row">
                             <div className="col-12 form-group">
-                                <Select options={inventoryCategories} name='category' label='Category' />
+                                <Select disabled={isEdit} options={inventoryCategories} name='category' label='Category' />
                             </div>
                             <div className="col-12 form-group">
                                 <Input label='Cost' type='number' name="cost" id="inventory-form-cost" placeholder="0" />
@@ -52,18 +69,18 @@ export const AddorEditInventoryRaw = ({ formValues, onClose, handleSubmit, initi
                                 <Input label='Number of Units' type='number' name="units" id="inventory-form-units" placeholder="0" />
                             </div>
                             <div className="col-12 form-group">
-                                <Select options={animalTypes} name='animal_category' label='Category' />
+                                <Select disabled={isEdit} options={animalTypes} name='animal_category' label='Category' />
                             </div>
                             {
                                 category === SEMEN &&
                                 <div className="col-12 form-group">
-                                    <ParentSelect parent='father' type={animal_category} />
+                                    <ParentSelect disabled={isEdit} noneOption parent='father' type={animal_category} />
                                 </div>
                             }
                             {
                                 category === EMBRYO &&
                                 <div className="col-12 form-group">
-                                    <ParentSelect parent='mother' type={animal_category} />
+                                    <ParentSelect disabled={isEdit} noneOption parent='mother' type={animal_category} />
                                 </div>
                             }
                             <div className="col-12 form-group">
@@ -94,7 +111,8 @@ export const AddorEditInventoryRaw = ({ formValues, onClose, handleSubmit, initi
 
 export const AddorEditInventory = compose(
     connect(state => ({
-        formValues: getFormValues('inventoryForm')(state)
+        formValues: getFormValues('inventoryForm')(state),
+        editInventory: state.editInventory
     })),
     reduxForm({ form: 'inventoryForm', asyncValidate: validator(schema) })
 )(AddorEditInventoryRaw)

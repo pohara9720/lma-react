@@ -19,6 +19,7 @@ import { ProfilePage } from '../../pages/ProfilePage'
 import { LoginPage } from '../../pages/LoginPage';
 import { SignupPage } from '../../pages/SignupPage';
 import { AnimalDetailPage } from '../../pages/AnimalDetailPage'
+import { VerifyEmailPage } from '../../pages/VerifyEmailPage'
 import T from 'prop-types'
 import { AuthProvider } from './AuthProvider'
 import { ErrorBoundary } from '../molecules/ErrorBoundary';
@@ -85,7 +86,7 @@ export const Routes = () => {
                     <Route path="/sales/manage-invoice" authenticated>
                         <AddorEditInvoicePage />
                     </Route>
-                    <Route path="/sales/invoice/:invoiceId" authenticated>
+                    <Route path="/sales/:invoiceId" authenticated>
                         <InvoicePage />
                     </Route>
                     <Route path="/profile" authenticated>
@@ -102,6 +103,9 @@ export const Routes = () => {
                     </Route>
                     <Route path="/resend-email">
                         <ResendEmailPage />
+                    </Route>
+                    <Route path="/verify-email/:token">
+                        <VerifyEmailPage />
                     </Route>
                     <Route path="/signup">
                         <SignupPage />

@@ -36,3 +36,21 @@ export const debounce = (func, wait) => {
         timeout = setTimeout(later, wait);
     };
 };
+
+export const displayToast = ({ error, success }) => {
+    const toast = document.getElementById("snackbar-toast");
+    const errorText = document.createTextNode('There was an issue processing your request. Please try again');
+    const successText = document.createTextNode('You request was successful');
+    if (error) {
+        toast.className = "show error";
+        toast.appendChild(errorText);
+    }
+    if (success) {
+        toast.className = "show success";
+        toast.appendChild(successText);
+    }
+    setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    setTimeout(() => { toast.className = toast.className.replace("error", ""); }, 3000);
+    setTimeout(() => { toast.className = toast.className.replace("success", ""); }, 3000);
+    setTimeout(() => { toast.removeChild(error ? errorText : successText) }, 3000);
+}

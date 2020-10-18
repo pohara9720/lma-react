@@ -1,21 +1,16 @@
 import React from 'react'
-import { connect } from 'react-redux'
+import { Link, withRouter } from 'react-router-dom'
 import logo from '../app-assets/images/logo/logo.png'
-import { api } from '../helpers/api'
+import { useFetch } from '../hooks/useFetch'
 import { displayToast } from '../helpers/index'
 
-export const ResendEmailPageRaw = ({ registeredUser }) => {
-    const { email } = registeredUser || {}
-    const onClick = async () => {
-        try {
-            await api.post('user/resend_email/', { email })
-            displayToast({ success: true })
-        } catch (error) {
-            displayToast({ error: true })
-            console.log(error)
-        }
-
+export const VerifyEmailPageRaw = ({ match }) => {
+    const { token } = match.params
+    const { error } = useFetch(`verify-email/?token=${token}`)
+    if (error) {
+        displayToast({ error: true })
     }
+
     return (
         <form>
             <div className="boxicon-layout no-card-shadow blank-page login" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
@@ -37,14 +32,14 @@ export const ResendEmailPageRaw = ({ registeredUser }) => {
                                                 <div className="card disable-rounded-right mb-0 h-100 justify-content-center">
                                                     <div className="card-header pb-1">
                                                         <div className="card-title">
-                                                            <h3 className="text-left mb-2">Please verify your email.</h3>
+                                                            <h3 className="text-left mb-2">Email Verified</h3>
                                                         </div>
                                                     </div>
                                                     <div className="card-content">
                                                         <div className="card-body">
                                                             <div>
                                                                 <div className="form-group text-left">
-                                                                    <button disabled={!email} onClick={onClick} className="btn btn-primary glow w-45">Resend Email</button>
+                                                                    <Link to='/login' className="btn btn-primary glow w-45">Login</Link>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -63,7 +58,5 @@ export const ResendEmailPageRaw = ({ registeredUser }) => {
     )
 }
 
-const mapStateToProps = ({ registeredUser }) => ({ registeredUser })
-
-export const ResendEmailPage = connect(mapStateToProps, null)(ResendEmailPageRaw)
+export const VerifyEmailPage = withRouter(VerifyEmailPageRaw)
 

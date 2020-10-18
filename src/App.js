@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes } from './components/atoms/Routes'
 import { Provider } from 'react-redux';
 import logger from "redux-logger";
+import { Toast } from './components/atoms/Toast'
 import { rootReducer, initState as initialState } from './redux/reducers/index'
 import { createStore, applyMiddleware } from "redux";
 
@@ -42,6 +43,7 @@ const App = () => {
   return (
     <Provider store={store}>
       <Routes />
+      <Toast />
     </Provider>
   );
 }

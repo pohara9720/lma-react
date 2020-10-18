@@ -13,7 +13,7 @@ const InvoiceItem = ({ fields, meta: { error }, animals, inventory, formValues, 
         <div>
             {fields.map((field, i) => {
                 const { type, cost, quantity, item } = invoice_items && invoice_items[i] || {}
-                const found = inventory.find(x => x.id === item)
+                const found = inventory && inventory.find(x => x.id === item)
                 const itemSelection = type === INVENTORY ? inventory : animals
                 const total = Number.isNaN((cost * quantity)) ? 0 : (cost * quantity).toFixed(2)
 
@@ -21,12 +21,6 @@ const InvoiceItem = ({ fields, meta: { error }, animals, inventory, formValues, 
                     const { id, type, tag_number, name, tank_number } = option || {}
                     const value = type ? `${name} (Tag#${tag_number})` : `Tank#(${tank_number})`
                     return <option key={id} value={id}>{value}</option>
-                }
-
-                if (type === INVENTORY) {
-                    if (found) {
-                        changeFieldValue(found.cost, i, 'cost')
-                    }
                 }
 
                 if (quantity > found?.units) {
@@ -51,7 +45,7 @@ const InvoiceItem = ({ fields, meta: { error }, animals, inventory, formValues, 
                                     <Select options={itemSelection} name={`${field}.item`} render={render} />
                                 </div>
                                 <div className="col-md-2 col-12 form-group">
-                                    <Input name={`${field}.cost`} type='number' disabled={type === INVENTORY} />
+                                    <Input name={`${field}.cost`} type='number' />
                                 </div>
                                 <div className="col-md-2 col-12 form-group">
                                     <Input name={`${field}.quantity`} type='number' className='' />
@@ -112,8 +106,8 @@ export const InvoiceItemCreator = ({ initialize, inventory, animals, invoiceItem
             <FieldArray
                 name='invoice_items'
                 component={InvoiceItem}
-                inventory={inventory}
-                animals={animals}
+                inventory={inventory.results}
+                animals={animals.results}
                 formValues={formValues}
                 invoiceItems={invoiceItems}
                 changeFieldValue={changeFieldValue}

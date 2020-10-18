@@ -9,6 +9,7 @@ import { reduxForm, getFormValues } from 'redux-form'
 import { withRouter } from 'react-router-dom'
 import { api } from '../helpers/api'
 import { connect } from 'react-redux'
+import { displayToast } from '../helpers/index'
 import { compose } from 'recompose'
 import { saleValidator as validate } from '../helpers/validator'
 import { change } from 'redux-form'
@@ -31,13 +32,19 @@ export const AddorEditInvoicePageRaw = ({
     const totalValue = Number.isNaN(total) ? '-' : total && total.toFixed(2)
 
     const onSubmit = async values => {
-        const [total] = totalValue.split('.')
-        const payload = {
-            ...values,
-            total
+        try {
+            const [total] = totalValue.split('.')
+            const payload = {
+                ...values,
+                total
+            }
+            await api.post('sale/', payload)
+            history.push('/sales')
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
         }
-        await api.post('sale/', payload)
-        history.push('/sales')
+
     }
 
     return (

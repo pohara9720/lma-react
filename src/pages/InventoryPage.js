@@ -11,70 +11,99 @@ import { loadInventory } from '../redux/actions/inventory'
 import { api } from '../helpers/api'
 import { BulletLabel } from '../components/atoms/BulletLabel'
 import { setInvoiceItems } from '../redux/actions/invoiceItems'
-import { compare } from '../helpers/index'
+import { compare, displayToast } from '../helpers/index'
 import { PageWrapper } from '../components/atoms/PageWrapper'
 import { withRouter } from 'react-router-dom'
 import { compose } from 'recompose'
+import { setTaskItems, setTaskModal } from '../redux/actions/tasks'
+import { setEditInventory } from '../redux/actions/inventory'
 
-const columns = [
-    {
-        label: 'Top Id',
-        name: 'top_id'
-    },
-    {
-        label: 'Sire',
-        name: 'father',
-        render: (({ father }) => father ? <div>{`${father.name} (Tag# ${father.tag_number})`}</div> : 'N/A')
-    },
-    {
-        label: 'Dam',
-        name: 'mother',
-        render: (({ mother }) => mother ? <div>{`${mother.name} (Tag# ${mother.tag_number})`}</div> : 'N/A')
-    },
-    {
-        label: 'Tank #',
-        name: 'tank',
-        render: (({ tank_number }) => tank_number.toString())
-
-    },
-    {
-        label: 'Canister #',
-        name: 'canister',
-        render: (({ canister_number }) => canister_number.toString())
-    },
-    {
-        label: 'Category',
-        name: 'category',
-        render: (({ category }) => <BulletLabel label={category} />)
-    },
-]
-
-export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems, history }) => {
+export const InventoryPageRaw = ({
+    inventory,
+    loadInventory,
+    setInvoiceItems,
+    history,
+    setTaskItems,
+    setTaskModal,
+    setEditInventory
+}) => {
     const { Modal, toggle } = useModal()
-    const { selected, Table } = useTable(inventory, columns)
+
+    const columns = [
+        {
+            label: '',
+            name: 'id',
+            render: ((item) =>
+                <div onClick={() => {
+                    toggle()
+                    setEditInventory(item)
+                }} style={{ cursor: 'pointer' }}>
+                    <i className='bx bx-edit' />
+                </div>)
+        },
+        {
+            label: 'Top Id',
+            name: 'top_id'
+        },
+        {
+            label: 'Sire',
+            name: 'father',
+            render: (({ father }) => father ? <div>{`${father.name} (Tag# ${father.tag_number})`}</div> : 'N/A')
+        },
+        {
+            label: 'Dam',
+            name: 'mother',
+            render: (({ mother }) => mother ? <div>{`${mother.name} (Tag# ${mother.tag_number})`}</div> : 'N/A')
+        },
+        {
+            label: 'Tank #',
+            name: 'tank',
+            render: (({ tank_number }) => tank_number.toString())
+
+        },
+        {
+            label: 'Canister #',
+            name: 'canister',
+            render: (({ canister_number }) => canister_number.toString())
+        },
+        {
+            label: '# of Units',
+            name: 'units',
+            render: (({ units }) => units.toString())
+        },
+        {
+            label: 'Category',
+            name: 'category',
+            render: (({ category }) => <BulletLabel label={category} />)
+        },
+    ]
+
+    const { selected, Table, page } = useTable(inventory, columns)
 
     const searchConfig = {
         entity: 'inventory',
-        keys: ['top_id', 'tank_number'],
         setter: loadInventory
     }
 
     useEffect(() => {
         const fetch = async () => {
-            const { data: init } = await api.get('inventory')
+            const { data: init } = await api.get(`inventory/?page=${page}`)
             loadInventory(init)
         }
         fetch()
-    }, [])
+    }, [page])
 
     const onCreateSale = () => {
-        const items = compare(selected, inventory)
+        const items = compare(selected, inventory.results)
         setInvoiceItems(items)
         history.push('/sales/manage-invoice')
     }
 
     const onAssign = () => {
-        console.log(selected)
+        const items = compare(selected, inventory.results)
+        setTaskItems(items)
+        history.push('/tasks')
+        setTaskModal(true)
     }
 
     const onDelete = () => {
@@ -86,9 +115,40 @@ export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems, hi
     }
 
     const onSubmit = async values => {
-        const { data } = await api.post('inventory/', values)
-        loadInventory([data, ...inventory])
+        try {
+            const { data } = await api.post('inventory/', values)
+            const { results, ...rest } = inventory
+            loadInventory({
+                results: [data, ...results],
+                ...rest
+            })
+            toggle()
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
+
+    }
+
+    const onEdit = async (values, id) => {
+        try {
+            const { data } = await api.patch(`inventory/${id}/`, values)
+            const { results, ...rest } = inventory
+            const updated = results.filter(x => x.id !== id)
+            loadInventory({
+                results: [data, ...updated],
+                ...rest
+            })
+            toggle()
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
+    }
+
+    const onClose = () => {
         toggle()
+        setEditInventory(null)
     }
 
     return (
@@ -100,8 +160,8 @@ export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems, hi
                     <TableHeaderActions searchConfig={searchConfig} options={inventoryOptions(onCreateSale, onAssign, onDelete)} filters={inventoryFilters(loadInventory)} />
                     <Table />
                 </section>
-                <Modal actionless title='Add Inventory' onClose={toggle}>
-                    <AddorEditInventory onClose={toggle} onSubmit={onSubmit} />
+                <Modal actionless title='Add Inventory' onClose={onClose}>
+                    <AddorEditInventory onClose={onClose} onSubmit={onSubmit} onEdit={onEdit} />
                 </Modal>
             </div>
         </PageWrapper>
@@ -109,9 +169,13 @@ export const InventoryPageRaw = ({ inventory, loadInventory, setInvoiceItems, hi
 }
 
 const mapStateToProps = ({ inventory }) => ({ inventory })
+
 const mapDispatchToProps = dispatch => ({
     loadInventory: (inventory) => dispatch(loadInventory({ inventory })),
-    setInvoiceItems: (invoiceItems) => dispatch(setInvoiceItems({ invoiceItems }))
+    setInvoiceItems: (invoiceItems) => dispatch(setInvoiceItems({ invoiceItems })),
+    setTaskItems: (taskItems) => dispatch(setTaskItems({ taskItems })),
+    setTaskModal: (boolean) => dispatch(setTaskModal(boolean)),
+    setEditInventory: (inventory) => dispatch(setEditInventory({ inventory }))
 })
 
 

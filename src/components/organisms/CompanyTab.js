@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 import { compose } from 'recompose'
 import { validator, fileSchema } from '../../helpers/validator'
 import { FileInput } from '../atoms/FileInput'
+import { displayToast } from '../../helpers'
 
 const schema = yup.object().shape({
     name: yup.string().required('Company name is required'),
@@ -30,15 +31,21 @@ export const CompanyTabRaw = ({ company, initialize, handleSubmit, ...rest }) =>
     }, [name, email, street, city, state, zipcode])
 
     const onSubmit = async values => {
-        const { logo, street, city, state, zipcode, name } = values
-        let formData = new FormData();
-        formData.append("logo", logo);
-        formData.append("street", street);
-        formData.append("city", city);
-        formData.append("state", state);
-        formData.append("zipcode", zipcode);
-        formData.append("name", name);
-        const { data } = await api.patch(`company/${id}/`, formData)
+        try {
+            const { logo, street, city, state, zipcode, name } = values
+            let formData = new FormData();
+            formData.append("logo", logo);
+            formData.append("street", street);
+            formData.append("city", city);
+            formData.append("state", state);
+            formData.append("zipcode", zipcode);
+            formData.append("name", name);
+            await api.patch(`company/${id}/`, formData)
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
+
     }
 
     return (

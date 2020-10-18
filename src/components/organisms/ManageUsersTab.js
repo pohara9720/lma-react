@@ -11,6 +11,10 @@ import { api } from '../../helpers/api'
 import { listUsers } from '../../redux/actions/users'
 import { connect } from 'react-redux'
 import styled from 'styled-components'
+import { displayToast, compare } from '../../helpers'
+import { compose } from 'recompose'
+import { withRouter } from 'react-router-dom'
+import { setTaskItems, setTaskModal } from '../../redux/actions/tasks'
 
 const Actions = styled.div`
     display:flex;
@@ -56,7 +60,7 @@ const emails = ({ fields }) => (
     </div>
 )
 
-const ModalContentRaw = ({ initialize, handleSubmit, onSubmit, ...rest }) => {
+const ModalContentRaw = ({ initialize, handleSubmit, onSubmit, disabled, submitting, ...rest }) => {
 
     useEffect(() => {
         initialize({ emails: [""] })
@@ -68,7 +72,7 @@ const ModalContentRaw = ({ initialize, handleSubmit, onSubmit, ...rest }) => {
                 <div className="tab-content mt-1 pl-0">
                     <div className="tab-pane container active" id="details" aria-labelledby="details-tab" role="tabpanel">
                         <FieldArray name="emails" component={emails} />
-                        <button onClick={() => console.log('hello')} style={{ width: '100%' }} className='btn btn-primary'>Submit</button>
+                        <button type='submit' disabled={submitting} style={{ width: '100%' }} className='btn btn-primary'>Submit</button>
                     </div>
                 </div>
             </div>
@@ -78,15 +82,26 @@ const ModalContentRaw = ({ initialize, handleSubmit, onSubmit, ...rest }) => {
 
 const ModalContent = reduxForm({ form: 'companyUserForm', validate })(ModalContentRaw)
 
-export const ManageUsersTabRaw = ({ loadUsers, users }) => {
+export const ManageUsersTabRaw = ({ loadUsers, users, history, setTaskModal, setTaskItems }) => {
+
     const onDelete = async id => {
-        const result = await api.delete(`user/${id}`)
-        const state = users.filter((user) => user.id !== id)
-        loadUsers(state)
+        try {
+            await api.delete(`user/${id}/`)
+            const { results, ...rest } = users || {}
+            const state = results.filter((user) => user.id !== id)
+            loadUsers({ ...rest, results: state })
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
     }
     const onResendLink = async email => {
-        const { data } = await api.post('user/resend_email/', { email })
-        console.log('DATA', data)
+        try {
+            await api.post('user/resend_email/', { email })
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
     }
 
     const columns = [
@@ -128,34 +143,56 @@ export const ManageUsersTabRaw = ({ loadUsers, users }) => {
     ]
 
     const { toggle, Modal } = useModal()
-    const { Table } = useTable(users, columns)
+    const { Table, page, selected } = useTable(users, columns)
 
     const searchConfig = {
         entity: 'user',
-        keys: ['first_name', 'last_name'],
         setter: loadUsers
+    }
+
+    const onAssign = () => {
+        const items = compare(selected, users.results)
+        setTaskItems(items)
+        history.push('/tasks')
+        setTaskModal(true)
+    }
+
+    const onDeleteMultiple = () => {
+        if (!selected.length) {
+            return null
+        } else {
+            console.log(selected)
+        }
     }
 
     useEffect(() => {
         const fetch = async () => {
-            const { data: init } = await api.get('user')
+            const { data: init } = await api.get(`user/?page=${page}`)
             loadUsers(init)
         }
         fetch()
-    }, [])
+    }, [page])
 
     const onSubmit = async (values) => {
-        const { data } = await api.post('user/', values)
-        const result = [...users, ...data]
-        loadUsers(result)
-        toggle()
+        try {
+            const { data } = await api.post('user/', values)
+            const { results, ...rest } = users
+            loadUsers({
+                results: [...results, ...data],
+                ...rest
+            })
+            toggle()
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
     }
 
     return (
         <div className="tab-pane fade active show" aria-labelledby="users-tab" role="tabpanel">
             <section className="invoice-list-wrapper">
                 <PageHeaderActions onAdd={toggle} title='Add User' />
-                <TableHeaderActions searchConfig={searchConfig} options={userOptions} />
+                <TableHeaderActions searchConfig={searchConfig} options={userOptions(onAssign, onDeleteMultiple)} />
                 <Table />
             </section>
             <Modal title='Add Users' onClose={toggle} actionless>
@@ -167,9 +204,14 @@ export const ManageUsersTabRaw = ({ loadUsers, users }) => {
 
 const mapStateToProps = ({ users, company }) => ({ users, company })
 const mapDispatchToProps = dispatch => ({
-    loadUsers: (users) => dispatch(listUsers({ users }))
+    loadUsers: (users) => dispatch(listUsers({ users })),
+    setTaskItems: (taskItems) => dispatch(setTaskItems({ taskItems })),
+    setTaskModal: (boolean) => dispatch(setTaskModal(boolean))
 })
 
-export const ManageUsersTab = connect(mapStateToProps, mapDispatchToProps)(ManageUsersTabRaw)
+export const ManageUsersTab = compose(
+    withRouter,
+    connect(mapStateToProps, mapDispatchToProps)
+)(ManageUsersTabRaw)
 
 

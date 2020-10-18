@@ -18,4 +18,6 @@ const remove = async (url, options = init) => await axios.delete(formatUrl(url),
 
 export const getPdf = (entity) => formatUrl(`${entity}/get_pdf`)
 
+export const downloadInvoice = id => formatUrl(`sale/${id}/download_invoice`)
+
 export const api = { get, post, put, delete: remove, patch }

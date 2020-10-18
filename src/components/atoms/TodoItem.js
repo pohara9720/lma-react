@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
 import { FEED, BREEDING, OTHER, HEALTH, REPRODUCTION } from '../../dictionary'
 import { StatusBubble } from './StatusBubble'
+import { api } from '../../helpers/api'
+import { connect } from 'react-redux'
+import { loadTasks } from '../../redux/actions/tasks'
+import { displayToast } from '../../helpers/index'
 
-export const TodoItem = ({ item }) => {
-    const [checked, setChecked] = useState(item.completed)
-    const { title, category, completed } = item
+export const TodoItemRaw = ({ item, tasks, loadTasks }) => {
+    const { title, category, completed, id } = item
 
     const colors = {
         [FEED]: 'primary',
@@ -14,16 +17,22 @@ export const TodoItem = ({ item }) => {
         [REPRODUCTION]: 'danger'
     }
 
-    const onClick = () => {
-        setChecked(!checked)
-        //API CALL TO MAKE TASK
+    const onClick = async () => {
+        try {
+            const { data } = await api.post(`task/${id}/change_status/`)
+            const update = tasks.filter(({ id: taskId }) => taskId !== id)
+            loadTasks([data, ...update])
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
     }
     return (
         <li className="todo-item task-item" data-name="David Smith">
             <div className="todo-title-wrapper d-flex justify-content-sm-between justify-content-end align-items-center">
                 <div className="todo-title-area d-flex">
                     <div onClick={onClick} className="checkbox">
-                        <input type="checkbox" className="checkbox-input" checked={checked} onChange={() => { }} />
+                        <input disabled={completed} type="checkbox" className="checkbox-input" checked={completed} onChange={onClick} />
                         <label htmlFor="checkbox1"></label>
                     </div>
                     <p className="todo-title mx-50 m-0 truncate">{title}</p>
@@ -40,3 +49,10 @@ export const TodoItem = ({ item }) => {
         </li>
     )
 }
+
+const mapStateToProps = ({ tasks }) => ({ tasks })
+const mapDispatchToProps = dispatch => ({
+    loadTasks: (tasks) => dispatch(loadTasks({ tasks }))
+})
+
+export const TodoItem = connect(mapStateToProps, mapDispatchToProps)(TodoItemRaw)

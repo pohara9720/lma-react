@@ -36,6 +36,8 @@ export const SEMEN = 'SEMEN'
 export const EMBRYO = 'EMBRYO'
 export const LIVESTOCK = 'LIVESTOCK'
 export const INVENTORY = 'INVENTORY'
+export const PAID = 'PAID'
+export const UNPAID = 'UNPAID'
 
 
 export const define = (dictionary = [], id) => {
@@ -54,7 +56,7 @@ export const animalFilters = (listAnimals) => {
         }
         else {
             const { data } = await api.get('animal')
-            listAnimals(data?.results)
+            listAnimals(data)
         }
     }
     return [
@@ -105,25 +107,40 @@ export const inventoryOptions = (onCreateSale, onAssign, onDelete) => {
     ]
 }
 
-export const invoiceFilters = [
-    { id: 'ALL_FILTERS', label: 'Filters', onClick: () => console.log('Hello') },
-    { id: 'DOWNLOADED', label: 'Downloaded', onClick: () => console.log('Hello') },
-    { id: 'SENT', label: 'Sent', onClick: () => console.log('Hello') },
-    { id: 'PARTIAL_PAYMENT', label: 'Partial Payment', onClick: () => console.log('Hello') },
-    { id: 'PAID', label: 'Paid', onClick: () => console.log('Hello') },
-]
+export const invoiceFilters = (loadSales) => {
+    const onClick = async (status) => {
+        if (status) {
+            const { data } = await api.get(`sale/${status}/by_type`)
+            loadSales(data)
+        }
+        else {
+            const { data } = await api.get('sale')
+            loadSales(data)
+        }
+    }
+    return [
+        { id: 'ALL_FILTERS', label: 'Filters', onClick: () => onClick() },
+        { id: 'PAID', label: 'Paid', onClick: () => onClick(PAID) },
+        { id: 'UNPAID', label: 'Unpaid', onClick: () => onClick(UNPAID) },
+    ]
+}
 
-export const invoiceOptions = [
-    { id: 'ALL_OPTIONS', label: 'Options', onClick: () => console.log('Hello') },
-    { id: 'SEND', label: 'Assign Tasks', onClick: () => console.log('Hello') },
-    { id: 'DELETE', label: 'Delete Inventory', onClick: () => console.log('Hello'), isDelete: true },
-]
+export const invoiceOptions = (onSend, onPaid) => {
+    return [
+        { id: 'ALL_OPTIONS', label: 'Options', onClick: () => { } },
+        { id: 'TO_PAID', label: 'Change Status to Paid', onClick: onPaid },
+        { id: 'SEND', label: 'Send', onClick: onSend },
+        { id: 'DELETE', label: 'Delete Invoice(s)', onClick: {}, isDelete: true }
+    ]
+}
 
-export const userOptions = [
-    { id: 'ALL_OPTIONS', label: 'Options', onClick: () => console.log('Hello') },
-    { id: 'SEND', label: 'Assign Task', onClick: () => console.log('Hello') },
-    { id: 'DELETE', label: 'Delete Selected', onClick: () => console.log('Hello'), isDelete: true },
-]
+export const userOptions = (onAssign, onDelete) => {
+    return [
+        { id: 'ALL_OPTIONS', label: 'Options', onClick: () => { } },
+        { id: 'ASSIGN', label: 'Assign Task', onClick: onAssign },
+        { id: 'DELETE', label: 'Delete Selected', onClick: onDelete, isDelete: true },
+    ]
+}
 
 export const invoiceTypeOptions = [
     { id: LIVESTOCK, label: 'Livestock' },

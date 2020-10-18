@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Field } from 'redux-form'
 import cow from '../../app-assets/images/slider/cow.jpg'
 
@@ -46,7 +46,9 @@ const Attachment = ({ input, meta: { touched, error } }) => {
 
 
 const HeaderAvatar = ({ input, meta: { touched, error } }) => {
+    const { value } = input
     const [preview, setPreview] = useState(null)
+    const img = preview || value
     const onInputChange = (e) => {
         e.preventDefault();
         const reader = new FileReader()
@@ -60,10 +62,11 @@ const HeaderAvatar = ({ input, meta: { touched, error } }) => {
         const el = document.getElementById(id)
         el.click()
     }
+
     return (
         <>
-            {preview
-                ? <img onClick={() => onClick('head-upload')} src={preview} className="avatar justify-content-center align-items-center" />
+            {img
+                ? <img onClick={() => onClick('head-upload')} src={img} className="avatar justify-content-center align-items-center" />
                 : <div onClick={() => onClick('head-upload')} className="avatar justify-content-center align-items-center">
                     <i className='bx bx-plus' />
                 </div>
@@ -74,7 +77,9 @@ const HeaderAvatar = ({ input, meta: { touched, error } }) => {
     )
 }
 const ProfileAvatar = ({ input, meta: { touched, error } }) => {
-    const [preview, setPreview] = useState(null)
+    const { value } = input
+    const [preview, setPreview] = useState(value)
+    const img = preview || value
     const onInputChange = (e) => {
         e.preventDefault();
         const reader = new FileReader()
@@ -89,8 +94,8 @@ const ProfileAvatar = ({ input, meta: { touched, error } }) => {
     }
     return (
         <>
-            {preview
-                ? <img onClick={() => onClick('prof-upload')} src={preview} className="card-content d-flex justify-content-center align-items-center" />
+            {img
+                ? <img onClick={() => onClick('prof-upload')} src={img} className="card-content d-flex justify-content-center align-items-center" />
                 : <div onClick={() => onClick('prof-upload')} className="card-content d-flex justify-content-center align-items-center">
                     <i className='bx bx-plus' />
                 </div>

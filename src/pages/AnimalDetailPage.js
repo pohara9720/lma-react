@@ -20,10 +20,12 @@ export const AnimalDetailPageRaw = ({ match, ...rest }) => {
         const fetch = async () => {
             const { data: animal } = await api.get(`animal/${match.params.animalId}`)
             const { data: tasks } = await api.post(`animal/${animal.id}/get_tasks/`)
+            const { data: breeding } = await api.post(`animal/${animal.id}/bred_info/`)
             const { data: children } = await api.post(`animal/get_offspring/`, { id: animal.id, sub_type: animal.sub_type })
             setAnimal(animal)
             setTasks(tasks)
             setChildren(children)
+            // console.log('BREEDING........', breeding) TODO - IMPLEMENT PROPERRLY
         }
         fetch()
     }, [match.params.animalId])
@@ -49,10 +51,11 @@ export const AnimalDetailPageRaw = ({ match, ...rest }) => {
 
     const healthTasks = tasks.filter(({ category }) => category === HEALTH)
     const otherTasks = tasks.filter(({ category }) => category !== HEALTH)
+    const { expenses } = animal || {}
 
     const renderPage = (active) => {
         switch (active) {
-            case 'Profitability': return <ProfitTab />
+            case 'Profitability': return <ProfitTab expenses={expenses} />
             case 'Offspring': return <OffspringTab offspring={children} setActive={setActive} />
             case 'Health': return <HealthTab tasks={healthTasks} />
             case 'Breeding': return <BreedingTab tasks={otherTasks} />

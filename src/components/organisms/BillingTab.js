@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Select } from '../atoms/Select'
 import { states } from '../../dictionary'
 import { Input } from '../atoms/Input'
@@ -9,6 +9,7 @@ import { validator } from '../../helpers/validator'
 import { compose } from 'recompose'
 import { api } from '../../helpers/api'
 import moment from 'moment'
+import { displayToast } from '../../helpers/index'
 
 const schema = yup.object().shape({
     name: yup.string().required('Name on card is required'),
@@ -29,16 +30,21 @@ export const BillingTabRaw = ({ company, initialize, handleSubmit }) => {
             const { data } = await api.get(`company/${payment_info}/get_stripe_account`)
             const { name, address, last4, exp_month, exp_year } = data || {}
             const { street, city, state, zipcode } = address || {}
-            const expiration = moment([exp_year, exp_month, 1]).format('YYYY-MM-DD')
+            const expiration = moment([exp_year, exp_month - 1, 1]).format('YYYY-MM-DD')
             initialize({ street, city, state, zipcode, name, expiration, number: `**** **** **** ${last4}` })
         }
         fetch()
     }, [payment_info])
 
     const onSubmit = async values => {
-        console.log(values)
-        // const { data } = await api.post(`company/${payment_info}/update_stripe_account`, values)
-        // console.log(data)
+        try {
+            console.log(values)
+            const { data } = await api.post(`company/${payment_info}/update_stripe_account/`, values)
+            console.log('DATA', data)
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
     }
 
     return (
@@ -78,17 +84,6 @@ export const BillingTabRaw = ({ company, initialize, handleSubmit }) => {
                             <Input label='Zip Code' placeholder='Zip Code' name='zipcode' />
                         </div>
                     </div>
-                    {/* <div className="col-md-6">
-                        <h4 className="mb-1">Recurring Payment</h4>
-                        <p className="text-muted text-uppercase font-small-3">Turn Off To Stop Recurring
-                                                Payments</p>
-                        <div className="custom-control custom-switch custom-control-inline mb-1">
-                            <input type="checkbox" className="custom-control-input" id="customSwitch1" />
-                            <label className="custom-control-label mr-1" htmlFor="customSwitch1">
-                            </label>
-                            <span>Payments On</span>
-                        </div>
-                    </div> */}
                 </div>
                 <div className="d-flex flex-sm-row flex-column justify-content-start mt-1">
                     <button type="submit" className="btn btn-primary glow mb-1 mb-sm-0 mr-0 mr-sm-1">Save Changes</button>

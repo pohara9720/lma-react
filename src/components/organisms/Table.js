@@ -1,7 +1,18 @@
 import React from 'react'
 import { withRouter } from 'react-router-dom'
+import { Pagination } from '../atoms/Pagination'
 
-export const TableRaw = ({ data, checked, setChecked, columns, all, onAll, history, match }) => {
+export const TableRaw = ({
+    data,
+    checked,
+    setChecked,
+    columns,
+    all,
+    onAll,
+    history,
+    match,
+    pagination
+}) => {
     const isChecked = key => checked.includes(key)
 
     const onCheck = key => checked.includes(key)
@@ -29,21 +40,24 @@ export const TableRaw = ({ data, checked, setChecked, columns, all, onAll, histo
     })
 
     return (
-        <div className="table-responsive table-p">
-            <table className="table invoice-data-table dt-responsive nowrap" style={{ width: "100%" }}>
-                <thead>
-                    <tr>
-                        <th className="dt-checkboxes-cell dt-checkboxes-select-all">
-                            <input type='checkbox' checked={all} onChange={() => onAll(data)} />
-                        </th>
-                        {headers}
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows}
-                </tbody>
-            </table>
-        </div>
+        <>
+            <div className="table-responsive table-p">
+                <table className="table invoice-data-table dt-responsive nowrap" style={{ width: "100%" }}>
+                    <thead>
+                        <tr>
+                            <th className="dt-checkboxes-cell dt-checkboxes-select-all">
+                                <input type='checkbox' checked={all} onChange={() => onAll(data)} />
+                            </th>
+                            {headers}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows}
+                    </tbody>
+                </table>
+            </div>
+            <Pagination pagination={pagination} />
+        </>
     )
 }
 

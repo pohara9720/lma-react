@@ -1,15 +1,22 @@
 import * as yup from 'yup'
 
 const SUPPORTED = ['image/jpg', 'image/jpeg', 'image/png', 'application/pdf', 'application/csv']
+
+const getUrlType = (url) => {
+    const segs = url.split('.')
+    const type = segs[segs.length - 1]
+    return SUPPORTED.some(x => x.includes(type))
+}
+
 export const fileSchema = yup.mixed()
     .test(
         "fileSize",
         "File is too large",
-        value => !value || (value && value.size <= 512000)
+        value => !value || (value && value.size <= 512000) || typeof value === 'string'
     ).test(
         "fileFormat",
         "Unsupported File type",
-        value => !value || (value && SUPPORTED.includes(value.type))
+        value => !value || (value && SUPPORTED.includes(value.type)) || getUrlType(value)
     )
 
 export const validator = (schema) => async formValues => {
@@ -88,7 +95,7 @@ export const saleValidator = values => {
             if (!item || typeof item !== 'string') {
                 invoiceErrors[index] = { item: 'Invoice item is required' }
             }
-            if (!cost) {
+            if (!cost || typeof cost !== 'string') {
                 invoiceErrors[index] = { cost: 'Cost is required' }
             }
             if (!quantity || typeof quantity !== 'string') {

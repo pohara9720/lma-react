@@ -2,8 +2,51 @@ import React from 'react'
 import { BreadCrumbs } from '../components/molecules/BreadCrumbs'
 import { InvoiceActions } from '../components/atoms/InvoiceActions'
 import logo from '../app-assets/images/logo/logo.png'
+import { withRouter } from 'react-router-dom'
+import { compose, withProps } from 'recompose'
+import { connect } from 'react-redux'
+import { useFetch } from '../hooks/useFetch'
+import { Loading } from '../components/atoms/Loading'
+import { readDate, displayToast } from '../helpers/index'
+import { api } from '../helpers/api'
+import { StatusBubble } from '../components/atoms/StatusBubble'
 
-export const InvoicePage = () => {
+
+export const InvoicePageRaw = ({ company, id }) => {
+    const { data, loading, error } = useFetch(`/sale/${id}`)
+
+    if (loading) return <Loading />
+    if (error) throw error
+
+    const { bill_to_name, bill_to_address, phone, number, email: bill_to_email, issue_date, due_date, items, status, title, total } = data || {}
+    const { name, email, address } = company || {}
+    const { street, city, state, zipcode } = address || {}
+
+    const onSend = async () => {
+        try {
+            await api.post('sale/resend_invoices/', { invoices: [{ email: bill_to_email, id }] })
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
+    }
+
+    const onDownload = async () => {
+        try {
+            const { data } = await api.get(`sale/${id}/download_invoice/`)
+            const url = window.URL.createObjectURL(new Blob([data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `invoice-${number}.pdf`); //or any other extension
+            document.body.appendChild(link);
+            link.click();
+            displayToast({ success: true })
+        } catch (error) {
+            console.log(error)
+            displayToast({ error: true })
+        }
+    }
+
     return (
         <div className="app-content content">
             <div className="content-overlay"></div>
@@ -19,17 +62,17 @@ export const InvoicePage = () => {
                                             <div className="row">
                                                 <div className="col-xl-4 col-md-12">
                                                     <span className="invoice-number mr-50">Invoice#</span>
-                                                    <span>000756</span>
+                                                    <span>{number}</span>
                                                 </div>
                                                 <div className="col-xl-8 col-md-12">
                                                     <div className="d-flex align-items-center justify-content-xl-end flex-wrap">
                                                         <div className="mr-3">
                                                             <small className="text-muted">Date Issue:</small>
-                                                            <span>08/10/2019</span>
+                                                            <span>{readDate(issue_date)}</span>
                                                         </div>
                                                         <div>
                                                             <small className="text-muted">Date Due:</small>
-                                                            <span>08/10/2019</span>
+                                                            <span>{readDate(due_date)}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -37,7 +80,7 @@ export const InvoicePage = () => {
                                             <div className="row my-3">
                                                 <div className="col-6">
                                                     <h4 className="text-primary">Invoice</h4>
-                                                    <span>Cattle</span>
+                                                    <span>{title}</span>
                                                 </div>
                                                 <div className="col-6 d-flex justify-content-end">
                                                     <img src={logo} alt="logo" height="46" />
@@ -49,31 +92,28 @@ export const InvoicePage = () => {
                                                 <div className="col-6 mt-1">
                                                     <h6 className="invoice-from">Bill From</h6>
                                                     <div className="mb-1">
-                                                        <span>Clevision PVT. LTD.</span>
+                                                        <span>{name}</span>
                                                     </div>
                                                     <div className="mb-1">
-                                                        <span>9205 Whitemarsh Street New York, NY 10002</span>
+                                                        <span>{street} {city}, {state} {zipcode}</span>
                                                     </div>
                                                     <div className="mb-1">
-                                                        <span>hello@clevision.net</span>
-                                                    </div>
-                                                    <div className="mb-1">
-                                                        <span>601-678-8022</span>
+                                                        <span>{email}</span>
                                                     </div>
                                                 </div>
                                                 <div className="col-6 mt-1">
                                                     <h6 className="invoice-to">Bill To</h6>
                                                     <div className="mb-1">
-                                                        <span>Pixinvent PVT. LTD.</span>
+                                                        <span>{bill_to_name}</span>
                                                     </div>
                                                     <div className="mb-1">
-                                                        <span>203 Sussex St. Suite B Waukegan, IL 60085</span>
+                                                        <span>{bill_to_address}</span>
                                                     </div>
                                                     <div className="mb-1">
-                                                        <span>pixinvent@gmail.com</span>
+                                                        <span>{bill_to_email}</span>
                                                     </div>
                                                     <div className="mb-1">
-                                                        <span>987-352-5603</span>
+                                                        <span>{phone}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -92,22 +132,18 @@ export const InvoicePage = () => {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr>
-                                                        <td>Livestock</td>
-                                                        <td>TAG 554</td>
-                                                        <td>Cows</td>
-                                                        <td>2,500</td>
-                                                        <td>1</td>
-                                                        <td className="text-primary text-right font-weight-bold">$5,000.00</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Inventory</td>
-                                                        <td>395</td>
-                                                        <td>Embryo</td>
-                                                        <td>1,250</td>
-                                                        <td>4</td>
-                                                        <td className="text-primary text-right font-weight-bold">$6,250.00</td>
-                                                    </tr>
+                                                    {
+                                                        items && items.map(({ type, cost, description, inventory, animal, quantity }, i) =>
+                                                            <tr key={i}>
+                                                                <td>{type}</td>
+                                                                <td>{animal ? `${animal.name} (${animal.tag_number})` : `Tank# ${inventory.tank_number}`}</td>
+                                                                <td>{description}</td>
+                                                                <td>${cost.toFixed(2)}</td>
+                                                                <td>{quantity}</td>
+                                                                <td className="text-primary text-right font-weight-bold">${(quantity * cost).toFixed(2)}</td>
+                                                            </tr>
+                                                        )
+                                                    }
                                                 </tbody>
                                             </table>
                                         </div>
@@ -127,17 +163,17 @@ export const InvoicePage = () => {
                                                 <div className="col-8 col-sm-6 d-flex justify-content-end mt-75">
                                                     <div className="invoice-subtotal">
                                                         <div className="invoice-calc d-flex justify-content-between">
-                                                            <span className="invoice-title">Subtotal</span>
-                                                            <span className="invoice-value">$ 11,250.00</span>
+                                                            <span className="invoice-title">Status</span>
+                                                            <span className="invoice-value"><StatusBubble status={status} color={status === 'PAID' ? 'success' : 'danger'} /></span>
                                                         </div>
                                                         <hr />
                                                         <div className="invoice-calc d-flex justify-content-between">
                                                             <span className="invoice-title">Invoice Total</span>
-                                                            <span className="invoice-value">$ 10,000.00</span>
+                                                            <span className="invoice-value">${total?.toFixed(2)}</span>
                                                         </div>
                                                         <div className="invoice-calc d-flex justify-content-between">
                                                             <span className="invoice-title">Balance (USD)</span>
-                                                            <span className="invoice-value">$ 10,000.00</span>
+                                                            <span className="invoice-value">${total?.toFixed(2)}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -146,7 +182,7 @@ export const InvoicePage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <InvoiceActions onDownload={() => console.log('download')} onSend={() => console.log('send email')} />
+                            <InvoiceActions onDownload={onDownload} onSend={onSend} />
                         </div>
                     </section>
                 </div>
@@ -154,3 +190,13 @@ export const InvoicePage = () => {
         </div>
     )
 }
+
+const mapStateToProps = ({ company }) => ({ company })
+
+export const InvoicePage = compose(
+    withRouter,
+    withProps(({ match }) => ({
+        id: match.params.invoiceId
+    })),
+    connect(mapStateToProps, null),
+)(InvoicePageRaw)

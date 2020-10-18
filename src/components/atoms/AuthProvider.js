@@ -39,9 +39,9 @@ const AuthProviderRaw = ({
                     const { company, ...user } = data
                     setActiveUser(user)
                     loadCompany(company)
-                    loadInventory(company.inventory)
-                    listAnimals(company.animals)
-                    loadUsers(company.users)
+                    loadInventory({ results: company.inventory })
+                    listAnimals({ results: company.animals })
+                    loadUsers({ results: company.users })
                     loadTasks(company.tasks)
                 } catch (error) {
                     throw error
