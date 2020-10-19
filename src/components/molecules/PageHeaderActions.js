@@ -1,5 +1,6 @@
 import React from 'react'
 import { getPdf } from '../../helpers/api'
+import { ImportCSVFile } from '../atoms/FileInput'
 
 export const PageHeaderActions = ({ title, onAdd, onExport, onImport }) => {
     const [action, entity] = title.split(' ')
@@ -15,9 +16,7 @@ export const PageHeaderActions = ({ title, onAdd, onExport, onImport }) => {
                 </div>
             }
             {onImport &&
-                <div className="csv-btn mb-1">
-                    <a href="#" onClick={onImport} className="btn border glow invoice-create" role="button" aria-pressed="true">Import {entity}</a>
-                </div>
+                <ImportCSVFile entity={onImport} />
             }
         </div>
     )

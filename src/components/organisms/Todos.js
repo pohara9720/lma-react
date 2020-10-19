@@ -1,7 +1,7 @@
 import React from 'react'
 import { TodoItem } from '../atoms/TodoItem'
 // import { ActionDropdown } from '../atoms/ActionDropdown'
-import { FEED, BREEDING, OTHER, HEALTH, REPRODUCTION } from '../../dictionary'
+import { colors } from '../../dictionary'
 import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
@@ -9,13 +9,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 const localizer = momentLocalizer(moment)
 
 export const mapForCalendar = data => {
-    const colors = {
-        [FEED]: '#5A8DEE',
-        [BREEDING]: '#FDAC41',
-        [OTHER]: '#00CFDD',
-        [HEALTH]: '#39DA8A',
-        [REPRODUCTION]: '#FF5B5C'
-    }
+
     return data.map(({ task_due_date, title, category }) =>
         ({ title, start: task_due_date, end: task_due_date, color: colors[category] }))
 }

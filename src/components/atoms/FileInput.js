@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Field } from 'redux-form'
 import cow from '../../app-assets/images/slider/cow.jpg'
+import { api } from '../../helpers/api'
+import { displayToast } from '../../helpers/index'
 
 const Uploader = ({ input, label, init, meta: { touched, error } }) => {
     const [preview, setPreview] = useState(init || cow)
@@ -43,6 +45,30 @@ const Attachment = ({ input, meta: { touched, error } }) => {
         </>
     )
 }
+
+// const ImportCSV = ({ input, meta: { touched, error }, entity }) => {
+//     const onInputChange = e => {
+//         e.preventDefault();
+//         const reader = new FileReader()
+//         const file = e.target.files[0];
+//         input.onChange(file);
+//     }
+
+//     const onClick = id => {
+//         const el = document.getElementById(id)
+//         el.click()
+//     }
+
+//     return (
+//         <>
+//             <div className="csv-btn mb-1">
+//                 <a href="#" onClick={() => onClick('import-csv-file')} className="btn border glow invoice-create" role="button" aria-pressed="true">Import {entity}</a>
+//             </div>
+//             <input id='import-csv-file' type="file" style={{ display: 'none' }} onChange={onInputChange} accept=".pdf,.csv" />
+//             {touched && error && <p style={{ color: 'red' }}>{error}</p>}
+//         </>
+//     )
+// }
 
 
 const HeaderAvatar = ({ input, meta: { touched, error } }) => {
@@ -119,3 +145,46 @@ export const AvatarGroup = () => (
 export const FileInput = (props) => <Field type='file' component={Uploader} {...props} />
 
 export const AttachmentInput = (props) => <Field type='file' component={Attachment} {...props} />
+
+// export const ImportInput = (props) => <Field type='file' component={ImportCSV} {...props} />
+
+export const ImportCSVFile = ({ entity }) => {
+    const [csv, setCsv] = useState(null)
+    const onInputChange = e => {
+        e.preventDefault();
+        const file = e.target.files[0];
+        setCsv(file)
+    }
+
+    const onClick = id => {
+        const el = document.getElementById(id)
+        el.click()
+    }
+
+    useEffect(() => {
+        if (csv) {
+            let formData = new FormData();
+            formData.append('csv', csv)
+            const upload = async () => {
+                try {
+                    await api.post(`${entity}/upload_csv/`, formData)
+                    displayToast({ success: true })
+                } catch (error) {
+                    displayToast({ error: true })
+                }
+            }
+            upload()
+            setTimeout(() => setCsv(null), 2000);
+        }
+    }, [csv])
+
+    console.log(csv)
+    return (
+        <>
+            <div className="csv-btn mb-1">
+                <a href="#" onClick={() => onClick('import-csv-file')} className="btn border glow invoice-create" role="button" aria-pressed="true">Import</a>
+            </div>
+            <input id='import-csv-file' type="file" style={{ display: 'none' }} onChange={onInputChange} accept=".pdf,.csv" />
+        </>
+    )
+}

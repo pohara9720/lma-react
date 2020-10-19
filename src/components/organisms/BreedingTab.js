@@ -3,9 +3,9 @@ import { BREEDING } from '../../dictionary'
 import { TimelineItem } from './HealthTab'
 import { readDate } from '../../helpers/index'
 
-export const BreedingTab = ({ tasks }) => {
-    const breeding = tasks.find(({ category }) => category === BREEDING)
-    const { task_due_date, due_date, ...rest } = breeding || {}
+export const BreedingTab = ({ tasks, breeding, id }) => {
+    const { set, due_date, task_due_date } = breeding || {}
+    const bredTo = set?.female?.id === id ? set?.female : set?.animal_semen
     return (
         <div className="tab-pane active" id="breeding" aria-labelledby="breeding-tab" role="tabpanel">
             <div className="card border">
@@ -22,7 +22,7 @@ export const BreedingTab = ({ tasks }) => {
                         </div>
                         <div className="d-flex justify-content-between mb-1">
                             <span>Bred To</span>
-                            <span>Primo</span>
+                            <span>{bredTo?.name || 'N/A'}</span>
                         </div>
                     </div>
                 </div>

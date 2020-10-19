@@ -1,46 +1,129 @@
-import React from 'react'
-import { RadialChart, XYPlot, XAxis, YAxis, VerticalGridLines, LineSeries } from 'react-vis'
+import React, { useState, useEffect } from 'react'
+import {
+    RadialChart,
+    XYPlot,
+    XAxis,
+    YAxis,
+    VerticalGridLines,
+    HorizontalGridLines,
+    VerticalBarSeries,
+    LabelSeries
+} from 'react-vis'
 import styled from 'styled-components'
+import { FEED, REPRODUCTION, BREEDING, OTHER, HEALTH, colors } from '../../dictionary'
+import { api } from '../../helpers/api'
+import { readDate } from '../../helpers/index'
+import moment from 'moment'
 
 const PieContainer = styled.div`
     display:flex;
     align-items:center;
     flex-direction:row;
     justify-content:space-between;
+    svg {
+        overflow:visible;
+    }
 `
 
+const BarContainer = styled.div`
+    margin: 16px 0;
+    padding:16px;
+    svg {
+        overflow:visible;
+    }
+`
 
-export const ProfitTab = ({ expenses }) => {
-    console.log(expenses)
-    const myData = [{ angle: 1, label: 'Label', color: 'yellow' }, { angle: 2, label: 'Label', color: 'blue' }, { angle: 3, label: 'Label', color: 'red' }]
+export const ProfitTab = ({ expenses, id }) => {
+    const [sales, setSales] = useState(null)
+
+    useEffect(() => {
+        const fetch = async () => {
+            const { data } = await api.get(`invoiceitem/${id}/get_sales_for_animal/`)
+            setSales(data)
+        }
+        fetch()
+    }, [])
+
+    const { offspring, inventory, bar_data } = sales || {}
+
+    const labels = {
+        [FEED]: 'Feed',
+        [REPRODUCTION]: 'Reproduction',
+        [OTHER]: 'Other',
+        [HEALTH]: 'Health'
+    }
+    const mappedExpenses = expenses?.map(({ task_type, cost }) => ({
+        angle: cost,
+        label: `${labels[task_type]}`,
+        subLabel: `$${(cost / 100).toFixed(2)}`,
+        style: { stroke: '#fff', fill: colors[task_type] }
+    })) || [{ angle: 1, label: 'No Data' }]
+
+    const reducer = (a, c) => a + c.cost
+    const amount = array => array?.reduce(reducer, 0)
+    const ov = {
+        angle: amount(offspring),
+        label: 'Offspring',
+        subLabel: `$${amount(offspring)?.toFixed(2)}`,
+        style: { stroke: '#fff', fill: colors[BREEDING] }
+    }
+    const iv = {
+        angle: amount(inventory),
+        label: 'Inventory',
+        subLabel: `$${amount(inventory)?.toFixed(2)}`,
+        style: { stroke: '#fff', fill: colors[FEED] }
+    }
+
+    const [livestock, stock] = bar_data || []
+    const isPastMonth = (date) => {
+        const pastMonthFromDate = moment(date).subtract(1, 'M')
+        return moment(date).isAfter(pastMonthFromDate)
+    }
+    const lsData = livestock?.filter(({ sale }) => isPastMonth(sale.due_date)).map(({ cost, sale }) => ({ x: readDate(sale.due_date), y: cost })) || []
+    const invData = stock?.filter(({ sale }) => isPastMonth(sale.due_date)).map(({ cost, sale }) => ({ x: readDate(sale.due_date), y: cost })) || []
+    console.log(lsData)
+    // const greenData = [{ x: 'A', y: 10 }, { x: 'B', y: 5 }, { x: 'C', y: 15 }];
+
+    // const blueData = [{ x: 'A', y: 12 }, { x: 'B', y: 2 }, { x: 'C', y: 11 }];
+
+    const labelData = lsData.map((d, idx) => ({
+        x: d.x,
+        y: Math.max(lsData[idx]?.y, invData[idx]?.y)
+    }));
+
     return (
         <div className="tab-pane pl-0" id="profitability" aria-labelledby="profitability-tab" role="tabpanel">
-            {/* <XYPlot width={500} height={300}>
-                <XAxis />
-                <YAxis />
-                <LineSeries data={[{ x: 1, y: 10 }, { x: 2, y: 5 }, { x: 3, y: 15 }]} />
-            </XYPlot> */}
+            <BarContainer>
+                <XYPlot xType="ordinal" width={800} height={300} xDistance={100}>
+                    <VerticalGridLines />
+                    <HorizontalGridLines />
+                    <XAxis />
+                    <YAxis />
+                    <VerticalBarSeries className="vertical-bar-series-example" data={lsData} />
+                    <VerticalBarSeries data={invData} />
+                    <LabelSeries data={labelData} getLabel={d => d.x} />
+                </XYPlot>
+            </BarContainer>
+
             <PieContainer>
                 <div>
                     <h4>Sales</h4>
                     <RadialChart
-                        data={myData}
+                        data={[ov, iv]}
                         width={300}
                         height={300}
-                        label='Sales'
-                        labelsAboveChildren
                         showLabels
+                        animation
                     />
                 </div>
                 <div>
                     <h4>Expenses</h4>
                     <RadialChart
-                        data={myData}
+                        data={mappedExpenses}
                         width={300}
                         height={300}
-                        label='Sales'
-                        labelsAboveChildren
                         showLabels
+                        animation
                     />
                 </div>
             </PieContainer>

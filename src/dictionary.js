@@ -39,6 +39,13 @@ export const INVENTORY = 'INVENTORY'
 export const PAID = 'PAID'
 export const UNPAID = 'UNPAID'
 
+export const colors = {
+    [FEED]: '#5A8DEE',
+    [BREEDING]: '#FDAC41',
+    [OTHER]: '#00CFDD',
+    [HEALTH]: '#39DA8A',
+    [REPRODUCTION]: '#FF5B5C'
+}
 
 export const define = (dictionary = [], id) => {
     const found = dictionary.filter(x => x.id === id)

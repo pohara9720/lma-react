@@ -172,7 +172,7 @@ export const AnimalsPageRaw = ({
             <BreadCrumbs />
             <div className="content-body">
                 <section className="invoice-list-wrapper">
-                    <PageHeaderActions title='Add Animal' onAdd={toggle} onExport='animal' />
+                    <PageHeaderActions title='Add Animal' onAdd={toggle} onExport='animal' onImport='animal' />
                     <TableHeaderActions searchConfig={searchConfig} options={animalOptions(onCreateSale, onAssign, onDelete)} filters={animalFilters(listAnimals)} />
                     <Table />
                 </section>

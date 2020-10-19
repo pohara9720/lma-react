@@ -15,17 +15,18 @@ export const AnimalDetailPageRaw = ({ match, ...rest }) => {
     const [animal, setAnimal] = useState(null)
     const [tasks, setTasks] = useState([])
     const [children, setChildren] = useState([])
+    const [breeding, setBreeding] = useState(null)
 
     useEffect(() => {
         const fetch = async () => {
             const { data: animal } = await api.get(`animal/${match.params.animalId}`)
             const { data: tasks } = await api.post(`animal/${animal.id}/get_tasks/`)
-            const { data: breeding } = await api.post(`animal/${animal.id}/bred_info/`)
+            const { data: breedData } = await api.post(`animal/${animal.id}/bred_info/`)
             const { data: children } = await api.post(`animal/get_offspring/`, { id: animal.id, sub_type: animal.sub_type })
             setAnimal(animal)
             setTasks(tasks)
             setChildren(children)
-            // console.log('BREEDING........', breeding) TODO - IMPLEMENT PROPERRLY
+            setBreeding(breedData)
         }
         fetch()
     }, [match.params.animalId])
@@ -49,16 +50,17 @@ export const AnimalDetailPageRaw = ({ match, ...rest }) => {
         }
     ]
 
+    const { expenses, id } = animal || {}
+
     const healthTasks = tasks.filter(({ category }) => category === HEALTH)
     const otherTasks = tasks.filter(({ category }) => category !== HEALTH)
-    const { expenses } = animal || {}
 
     const renderPage = (active) => {
         switch (active) {
-            case 'Profitability': return <ProfitTab expenses={expenses} />
+            case 'Profitability': return <ProfitTab expenses={expenses} id={id} />
             case 'Offspring': return <OffspringTab offspring={children} setActive={setActive} />
             case 'Health': return <HealthTab tasks={healthTasks} />
-            case 'Breeding': return <BreedingTab tasks={otherTasks} />
+            case 'Breeding': return <BreedingTab tasks={otherTasks} breeding={breeding} id={id} />
             default: return <BreedingTab tasks={otherTasks} />
         }
     }

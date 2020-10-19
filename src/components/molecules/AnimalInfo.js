@@ -7,6 +7,7 @@ export const AnimalInfo = ({ animal }) => {
         registration_number,
         type,
         dob,
+        name,
         father,
         mother,
         father_placeholder,
@@ -28,6 +29,10 @@ export const AnimalInfo = ({ animal }) => {
                     <div className="card-content">
                         <div className="card-body">
                             <h4 className="card-title">Details</h4>
+                            <div className="d-flex justify-content-between mb-1">
+                                <span>Name</span>
+                                <span>{name}</span>
+                            </div>
                             <div className="d-flex justify-content-between mb-1">
                                 <span>Registration #</span>
                                 <span>{registration_number}</span>

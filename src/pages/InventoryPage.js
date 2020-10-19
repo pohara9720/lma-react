@@ -156,7 +156,7 @@ export const InventoryPageRaw = ({
             <BreadCrumbs />
             <div className="content-body">
                 <section className="invoice-list-wrapper">
-                    <PageHeaderActions title='Add Inventory' onAdd={toggle} onExport='inventory' />
+                    <PageHeaderActions title='Add Inventory' onAdd={toggle} onExport='inventory' onImport='inventory' />
                     <TableHeaderActions searchConfig={searchConfig} options={inventoryOptions(onCreateSale, onAssign, onDelete)} filters={inventoryFilters(loadInventory)} />
                     <Table />
                 </section>
