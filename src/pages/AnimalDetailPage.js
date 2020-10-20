@@ -16,6 +16,7 @@ export const AnimalDetailPageRaw = ({ match, ...rest }) => {
     const [tasks, setTasks] = useState([])
     const [children, setChildren] = useState([])
     const [breeding, setBreeding] = useState(null)
+    const [sales, setSales] = useState(null)
 
     useEffect(() => {
         const fetch = async () => {
@@ -23,10 +24,12 @@ export const AnimalDetailPageRaw = ({ match, ...rest }) => {
             const { data: tasks } = await api.post(`animal/${animal.id}/get_tasks/`)
             const { data: breedData } = await api.post(`animal/${animal.id}/bred_info/`)
             const { data: children } = await api.post(`animal/get_offspring/`, { id: animal.id, sub_type: animal.sub_type })
+            const { data: items } = await api.get(`invoiceitem/${match.params.animalId}/get_sales_for_animal/`)
             setAnimal(animal)
             setTasks(tasks)
             setChildren(children)
             setBreeding(breedData)
+            setSales(items)
         }
         fetch()
     }, [match.params.animalId])
@@ -57,7 +60,7 @@ export const AnimalDetailPageRaw = ({ match, ...rest }) => {
 
     const renderPage = (active) => {
         switch (active) {
-            case 'Profitability': return <ProfitTab expenses={expenses} id={id} />
+            case 'Profitability': return <ProfitTab expenses={expenses} sales={sales} />
             case 'Offspring': return <OffspringTab offspring={children} setActive={setActive} />
             case 'Health': return <HealthTab tasks={healthTasks} />
             case 'Breeding': return <BreedingTab tasks={otherTasks} breeding={breeding} id={id} />

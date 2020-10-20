@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import {
     RadialChart,
     XYPlot,
@@ -7,14 +7,22 @@ import {
     VerticalGridLines,
     HorizontalGridLines,
     VerticalBarSeries,
-    LabelSeries
 } from 'react-vis'
+import { BulletLabel } from '../atoms/BulletLabel'
 import styled from 'styled-components'
 import { FEED, REPRODUCTION, BREEDING, OTHER, HEALTH, colors } from '../../dictionary'
-import { api } from '../../helpers/api'
 import { readDate } from '../../helpers/index'
 import moment from 'moment'
 
+const Key = styled.div`
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    margin-bottom:16px;
+    div {
+        margin-right:16px;
+    }
+`
 const PieContainer = styled.div`
     display:flex;
     align-items:center;
@@ -33,18 +41,11 @@ const BarContainer = styled.div`
     }
 `
 
-export const ProfitTab = ({ expenses, id }) => {
-    const [sales, setSales] = useState(null)
-
-    useEffect(() => {
-        const fetch = async () => {
-            const { data } = await api.get(`invoiceitem/${id}/get_sales_for_animal/`)
-            setSales(data)
-        }
-        fetch()
-    }, [])
+export const ProfitTab = ({ expenses, sales }) => {
 
     const { offspring, inventory, bar_data } = sales || {}
+
+    const noSaleData = !offspring?.length && !inventory?.length
 
     const labels = {
         [FEED]: 'Feed',
@@ -81,50 +82,55 @@ export const ProfitTab = ({ expenses, id }) => {
     }
     const lsData = livestock?.filter(({ sale }) => isPastMonth(sale.due_date)).map(({ cost, sale }) => ({ x: readDate(sale.due_date), y: cost })) || []
     const invData = stock?.filter(({ sale }) => isPastMonth(sale.due_date)).map(({ cost, sale }) => ({ x: readDate(sale.due_date), y: cost })) || []
-    console.log(lsData)
     // const greenData = [{ x: 'A', y: 10 }, { x: 'B', y: 5 }, { x: 'C', y: 15 }];
 
     // const blueData = [{ x: 'A', y: 12 }, { x: 'B', y: 2 }, { x: 'C', y: 11 }];
-
-    const labelData = lsData.map((d, idx) => ({
-        x: d.x,
-        y: Math.max(lsData[idx]?.y, invData[idx]?.y)
-    }));
-
     return (
         <div className="tab-pane pl-0" id="profitability" aria-labelledby="profitability-tab" role="tabpanel">
             <BarContainer>
+                <Key>
+                    <BulletLabel label='Inventory' color='info' />
+                    <BulletLabel label='Offspring' color='primary' />
+                </Key>
                 <XYPlot xType="ordinal" width={800} height={300} xDistance={100}>
                     <VerticalGridLines />
                     <HorizontalGridLines />
                     <XAxis />
                     <YAxis />
-                    <VerticalBarSeries className="vertical-bar-series-example" data={lsData} />
-                    <VerticalBarSeries data={invData} />
-                    <LabelSeries data={labelData} getLabel={d => d.x} />
+                    <VerticalBarSeries data={lsData} stroke='#fff' fill={colors[FEED]} animation />
+                    <VerticalBarSeries data={invData} stroke='#fff' fill={colors[OTHER]} animation />
                 </XYPlot>
             </BarContainer>
 
             <PieContainer>
                 <div>
                     <h4>Sales</h4>
-                    <RadialChart
-                        data={[ov, iv]}
-                        width={300}
-                        height={300}
-                        showLabels
-                        animation
-                    />
+                    {
+                        !noSaleData
+                            ?
+                            <RadialChart
+                                data={[ov, iv]}
+                                width={300}
+                                height={300}
+                                showLabels
+                                animation
+                            />
+                            : <div>No data</div>
+                    }
                 </div>
                 <div>
                     <h4>Expenses</h4>
-                    <RadialChart
-                        data={mappedExpenses}
-                        width={300}
-                        height={300}
-                        showLabels
-                        animation
-                    />
+                    {
+                        expenses?.length
+                            ?
+                            <RadialChart
+                                data={mappedExpenses}
+                                width={300}
+                                height={300}
+                                showLabels
+                                animation
+                            />
+                            : <div>No data</div>}
                 </div>
             </PieContainer>
             {/* <div className="card widget-order-activity">

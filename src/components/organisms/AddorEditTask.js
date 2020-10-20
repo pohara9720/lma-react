@@ -208,7 +208,6 @@ export const AddorEditTaskRaw = ({ formValues,
                         isBreeding && breeding_type &&
                         <ul className="list-unstyled">
                             <FieldArray name="breeding" component={Breeding} options={breedingData} />
-
                         </ul>
                     }
                 </div>

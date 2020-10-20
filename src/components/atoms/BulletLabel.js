@@ -1,10 +1,10 @@
 import React from 'react'
 
-export const BulletLabel = ({ label }) => {
+export const BulletLabel = ({ label, color = 'warning' }) => {
     return (
-        <>
-            <span className="bullet bullet-warning bullet-sm"></span>
+        <div>
+            <span className={`bullet bullet-${color} bullet-sm`}></span>
             <small className="text-muted" style={{ marginLeft: 8 }}>{label}</small>
-        </>
+        </div>
     )
 }
