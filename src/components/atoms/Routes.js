@@ -101,6 +101,9 @@ export const Routes = () => {
                     <Route path="/login">
                         <LoginPage />
                     </Route>
+                    <Route exact path="/">
+                        <LoginPage />
+                    </Route>
                     <Route path="/resend-email">
                         <ResendEmailPage />
                     </Route>

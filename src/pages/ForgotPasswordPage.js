@@ -5,6 +5,8 @@ import { validator } from '../helpers/validator'
 import * as yup from 'yup'
 import { reduxForm } from 'redux-form'
 import { Input } from '../components/atoms/Input'
+import { displayToast } from '../helpers/index'
+import { api } from '../helpers/api'
 
 const schema = yup.object().shape({
     email: yup.string().email().required()
@@ -12,12 +14,18 @@ const schema = yup.object().shape({
 
 export const ForgotPasswordPageRaw = ({ handleSubmit }) => {
 
-    const submit = values => {
-        console.log(values)
+    const onSubmit = async values => {
+        try {
+            await api.post('user/forgot_password/', values)
+            displayToast({ success: true })
+        } catch (error) {
+            displayToast({ error: true })
+        }
+
     }
 
     return (
-        <form onSubmit={handleSubmit(submit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
             <div className="boxicon-layout no-card-shadow blank-page login" data-open="click" data-menu="vertical-menu-modern" data-col="1-column">
                 <div className="app-content content">
                     <div className="content-wrapper" style={{ padding: 0 }}>
