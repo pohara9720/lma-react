@@ -10,11 +10,11 @@ const localizer = momentLocalizer(moment)
 
 export const mapForCalendar = data => {
 
-    return data.map(({ task_due_date, title, category }) =>
-        ({ title, start: task_due_date, end: task_due_date, color: colors[category] }))
+    return data.map(({ task_due_date, title, category, ...rest }) =>
+        ({ title, start: task_due_date, end: task_due_date, color: colors[category], category, ...rest }))
 }
 
-const Calendar = ({ tasks }) =>
+const Calendar = ({ tasks, onEditTask }) =>
     <BigCalendar
         localizer={localizer}
         events={mapForCalendar(tasks)}
@@ -23,6 +23,7 @@ const Calendar = ({ tasks }) =>
         style={{ height: 500 }}
         selectable={false}
         onDrillDown={() => { }}
+        onSelectEvent={item => item.completed ? null : onEditTask({ task_due_date: item.start, ...item })}
         popup
         eventPropGetter={event => ({ style: { backgroundColor: event.color } })}
     />
@@ -34,15 +35,15 @@ const NoResults = () => (
     </div>
 )
 
-const TodoList = ({ tasks }) => {
+const TodoList = ({ tasks, ...rest }) => {
     return (
         <ul className="todo-task-list-wrapper list-unstyled task-list" id="todo-task-list-drag">
-            {!tasks.length ? <NoResults /> : tasks.map((item, i) => <TodoItem key={i} item={item} />)}
+            {!tasks.length ? <NoResults /> : tasks.map((item, i) => <TodoItem key={i} item={item} {...rest} />)}
         </ul>
     )
 }
 
-export const Todos = ({ tasks }) => {
+export const Todos = ({ tasks, ...rest }) => {
     return (
         <div className="content-right">
             <div className="content-wrapper">
@@ -51,7 +52,7 @@ export const Todos = ({ tasks }) => {
                     <div className="todo-app-area">
                         <div className="todo-app-list-wrapper">
                             <div className="todo-app-list">
-                                <Calendar tasks={tasks} />
+                                <Calendar tasks={tasks} {...rest} />
                                 <div style={{ marginBottom: 32 }} />
                                 <div className="todo-fixed-search d-flex justify-content-between align-items-center">
                                     <div className="sidebar-toggle d-block d-lg-none">
@@ -66,7 +67,7 @@ export const Todos = ({ tasks }) => {
                                     {/* <ActionDropdown options={taskFilters} /> */}
                                 </div>
                                 <div className="todo-task-list list-group">
-                                    <TodoList tasks={tasks} />
+                                    <TodoList tasks={tasks} {...rest} />
                                 </div>
                             </div>
                         </div>

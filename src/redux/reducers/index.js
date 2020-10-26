@@ -4,7 +4,7 @@ import { companyReducer } from "./company";
 import { userReducer, activeUserReducer, registeredUserReducer } from "./users";
 import { inventoryReducer, editInventoryReducer } from "./inventory";
 import { reducer as form } from 'redux-form';
-import { taskReducer, taskModalReducer, taskItemReducer } from "./tasks";
+import { taskReducer, taskModalReducer, taskItemReducer, editTaskReducer } from "./tasks";
 import { saleReducer } from "./sales";
 import { invoiceItemReducer } from "./invoiceItems";
 
@@ -21,7 +21,8 @@ export const initState = {
     taskModalOpen: false,
     taskItems: [],
     editAnimal: null,
-    editInventory: null
+    editInventory: null,
+    editTask: null
 }
 
 export const rootReducer = combineReducers({
@@ -38,6 +39,7 @@ export const rootReducer = combineReducers({
     taskItems: taskItemReducer,
     editAnimal: editAnimalReducer,
     editInventory: editInventoryReducer,
+    editTask: editTaskReducer,
     form
 });
 

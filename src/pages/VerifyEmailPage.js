@@ -6,8 +6,10 @@ import { displayToast } from '../helpers/index'
 
 export const VerifyEmailPageRaw = ({ match }) => {
     const { token } = match.params
-    const { error } = useFetch(`verify-email/?token=${token}`)
+    const { error, data } = useFetch(`/verify-email/?token=${token}`)
+    console.log(data)
     if (error) {
+        console.log(error)
         displayToast({ error: true })
     }
 

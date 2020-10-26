@@ -2,7 +2,7 @@ import React from 'react'
 import { getPdf } from '../../helpers/api'
 import { ImportCSVFile } from '../atoms/FileInput'
 
-export const PageHeaderActions = ({ title, onAdd, onExport, onImport }) => {
+export const PageHeaderActions = ({ title, onAdd, onExport, onImport, refetch }) => {
     const [action, entity] = title.split(' ')
     return (
         <div className="d-flex">
@@ -16,7 +16,7 @@ export const PageHeaderActions = ({ title, onAdd, onExport, onImport }) => {
                 </div>
             }
             {onImport &&
-                <ImportCSVFile entity={onImport} />
+                <ImportCSVFile entity={onImport} refetch={refetch} />
             }
         </div>
     )

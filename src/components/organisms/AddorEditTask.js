@@ -40,16 +40,16 @@ const schema = yup.object().shape({
     // conditionals
     breeding: yup.array().of(breedingObj).when('category', { is: c => c === BREEDING, then: s => s.required('Breeding sets are required') }),
     animals: yup.array().of(yup.string()).when('category', { is: c => c !== BREEDING, then: s => s.required('At least 1 animal must be selected') }),
-    due_date: yup.string().when('category', { is: c => c === BREEDING, then: s => s.required('Animal due date is required') }), //ONLY BREEDING
+    due_date: yup.string().when('category', { is: c => c === BREEDING, then: s => s.required('Animal due date is required'), otherwise: s => s.nullable(), }), //ONLY BREEDING
     cost: yup.number().when('category', { is: c => c !== BREEDING, then: s => s.required('Cost is required') }), //EVERYTHING BUT BREEDING
 })
 
 const Breeding = ({ fields, options }) => {
     const { females, semen } = options || {}
     const renderFemales = (({ id, name, tag_number }) => <option key={id} value={id}>{`${name} (${tag_number})`}</option>)
-    const renderSemen = (({ id, type, father, tag_number }) => {
+    const renderSemen = (({ id, type, father, tag_number, tank_number }) => {
         const itemType = type ? 'animal' : 'inventory'
-        const tagValue = type ? `Tag# ${tag_number}(Animal)` : `Tag# ${father.tag_number} (Semen)`
+        const tagValue = type ? `Tag# ${tag_number}(Animal)` : `${father ? 'Tag#' : 'Tank #'}${father?.tag_number || tank_number} (Semen)`
         return <option key={id} value={JSON.stringify({ id, type: itemType })}>{tagValue}</option>
     })
     return (
@@ -60,10 +60,10 @@ const Breeding = ({ fields, options }) => {
                         <div key={i}>
                             <div className='row'>
                                 <div className='form-group col-5'>
-                                    <Select render={renderFemales} options={females} name={`${item}.female_select`} label='Female' />
+                                    <Select disabled={!females?.length} placeholder={!females?.length ? 'None in system' : ''} render={renderFemales} options={females} name={`${item}.female_select`} label='Female' />
                                 </div>
                                 <div className='form-group col-5'>
-                                    <Select render={renderSemen} options={semen} name={`${item}.breeding_selection`} label='Male or Semen' />
+                                    <Select disabled={!semen?.length} placeholder={!semen?.length ? 'None in system' : ''} render={renderSemen} options={semen} name={`${item}.breeding_selection`} label='Male or Semen' />
                                 </div>
                                 <div className='col-2'>
                                     <Icon onClick={() => fields.remove(i)}>
@@ -92,6 +92,8 @@ export const AddorEditTaskRaw = ({ formValues,
     dispatch,
     submitting,
     taskItems,
+    editTask,
+    onEdit,
     ...rest
 }) => {
     const { category, breeding_type, task_due_date } = formValues || {}
@@ -102,6 +104,7 @@ export const AddorEditTaskRaw = ({ formValues,
     const [breedingData, setBreedingData] = useState([])
     const [defaultUsers, setDefaultUsers] = useState([])
     const [defaultAnimals, setDefaultAnimals] = useState([])
+    const isEdit = !!editTask
 
     const getDueDate = date => {
         switch (breeding_type) {
@@ -115,21 +118,62 @@ export const AddorEditTaskRaw = ({ formValues,
     }
 
     useEffect(() => {
+        let a = []
+        let u = []
+        let i = []
+        const mapBreeding = ({ female, animal_semen, inventory_semen }) => ({
+            female_select: female?.id,
+            breeding_selection: JSON.stringify({ id: animal_semen?.id || inventory_semen?.id, type: animal_semen ? 'animal' : 'inventory' })
+        })
+        const mapToForm = (({ type, first_name, last_name, id, tank_number, name, tag_number }) => {
+            if (type) {
+                a.push({ label: `${name} (Tag# ${tag_number})`, value: id })
+            }
+            if (first_name) {
+                u.push({ label: `${first_name} ${last_name}`, value: id })
+            }
+            if (tank_number) {
+                i.push({ id, tank_number })
+            }
+        })
+
+        if (isEdit) {
+            const { category, title, cost, task_due_date, due_date, users, animals, description, breeding_sets } = editTask || {}
+
+            users.map(mapToForm)
+            animals.map(mapToForm)
+            const common = {
+                category,
+                title,
+                cost: (cost / 100).toFixed(2),
+                task_due_date,
+                due_date: category !== BREEDING ? null : due_date,
+                users: users.map(({ id }) => id),
+                animals: animals.map(({ id }) => id),
+                description
+            }
+
+            const breedingInit = {
+                breeding: breeding_sets.map(mapBreeding),
+                breeding_type: breeding_sets[0]?.female?.type,
+                ...common
+            }
+
+            const init = breeding_sets?.length ? breedingInit : common
+
+            initialize(init)
+
+            if (a.length) {
+                setDefaultAnimals(a)
+            }
+            if (u.length) {
+                setDefaultUsers(u)
+            }
+            if (i.length) {
+                initialize({ category: BREEDING })
+            }
+        }
         if (taskItems && taskItems.length) {
-            let u = []
-            let a = []
-            let i = []
-            const mapToForm = (({ type, first_name, last_name, id, tank_number, name, tag_number }) => {
-                if (type) {
-                    a.push({ label: `${name} (Tag# ${tag_number})`, value: id })
-                }
-                if (first_name) {
-                    u.push({ label: `${first_name} ${last_name}`, value: id })
-                }
-                if (tank_number) {
-                    i.push({ id, tank_number })
-                }
-            })
             taskItems.map(mapToForm)
             if (a.length) {
                 setDefaultAnimals(a)
@@ -150,15 +194,19 @@ export const AddorEditTaskRaw = ({ formValues,
         }
         if (isBreeding) {
             const due_date = getDueDate(task_due_date)
-            const breeding = [{}]
-            dispatch(change('taskForm', 'breeding', breeding))
+            if (!isEdit) {
+                const breeding = [{}]
+                dispatch(change('taskForm', 'breeding', breeding))
+            }
             dispatch(change('taskForm', 'due_date', due_date))
             fetch()
         }
     }, [task_due_date, breeding_type])
 
+    const Submission = isEdit ? v => onEdit(v, editTask.id) : onSubmit
+
     return (
-        <form id="compose-form" className="mt-1" onSubmit={handleSubmit(onSubmit)}>
+        <form id="compose-form" className="mt-1" onSubmit={handleSubmit(Submission)}>
             <div className="card-content">
                 <div className="card-body py-0 border-bottom">
                     <div className='form-group'>
@@ -236,6 +284,7 @@ export const AddorEditTask = compose(
         animals: state.animals.results,
         users: state.users.results,
         taskItems: state.taskItems,
-        formValues: getFormValues('taskForm')(state)
+        formValues: getFormValues('taskForm')(state),
+        editTask: state.editTask
     })),
     reduxForm({ form: 'taskForm', asyncValidate: validator(schema) }))(AddorEditTaskRaw)

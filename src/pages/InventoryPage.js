@@ -85,11 +85,12 @@ export const InventoryPageRaw = ({
         setter: loadInventory
     }
 
+    const fetch = async () => {
+        const { data: init } = await api.get(`inventory/?page=${page}`)
+        loadInventory(init)
+    }
+
     useEffect(() => {
-        const fetch = async () => {
-            const { data: init } = await api.get(`inventory/?page=${page}`)
-            loadInventory(init)
-        }
         fetch()
     }, [page])
 
@@ -156,7 +157,7 @@ export const InventoryPageRaw = ({
             <BreadCrumbs />
             <div className="content-body">
                 <section className="invoice-list-wrapper">
-                    <PageHeaderActions title='Add Inventory' onAdd={toggle} onExport='inventory' onImport='inventory' />
+                    <PageHeaderActions title='Add Inventory' onAdd={toggle} onExport='inventory' onImport='inventory' refetch={fetch} />
                     <TableHeaderActions searchConfig={searchConfig} options={inventoryOptions(onCreateSale, onAssign, onDelete)} filters={inventoryFilters(loadInventory)} />
                     <Table />
                 </section>

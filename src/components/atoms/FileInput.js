@@ -148,7 +148,7 @@ export const AttachmentInput = (props) => <Field type='file' component={Attachme
 
 // export const ImportInput = (props) => <Field type='file' component={ImportCSV} {...props} />
 
-export const ImportCSVFile = ({ entity }) => {
+export const ImportCSVFile = ({ entity, refetch }) => {
     const [csv, setCsv] = useState(null)
     const onInputChange = e => {
         e.preventDefault();
@@ -168,6 +168,7 @@ export const ImportCSVFile = ({ entity }) => {
             const upload = async () => {
                 try {
                     await api.post(`${entity}/upload_csv/`, formData)
+                    refetch()
                     displayToast({ success: true })
                 } catch (error) {
                     displayToast({ error: true })

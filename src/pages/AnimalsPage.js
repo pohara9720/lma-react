@@ -75,11 +75,12 @@ export const AnimalsPageRaw = ({
         setter: listAnimals
     }
 
+    const fetch = async () => {
+        const { data } = await api.get(`animal/?page=${page}`)
+        listAnimals(data)
+    }
+
     useEffect(() => {
-        const fetch = async () => {
-            const { data } = await api.get(`animal/?page=${page}`)
-            listAnimals(data)
-        }
         fetch()
     }, [page])
 
@@ -172,7 +173,7 @@ export const AnimalsPageRaw = ({
             <BreadCrumbs />
             <div className="content-body">
                 <section className="invoice-list-wrapper">
-                    <PageHeaderActions title='Add Animal' onAdd={toggle} onExport='animal' onImport='animal' />
+                    <PageHeaderActions title='Add Animal' onAdd={toggle} onExport='animal' onImport='animal' refetch={fetch} />
                     <TableHeaderActions searchConfig={searchConfig} options={animalOptions(onCreateSale, onAssign, onDelete)} filters={animalFilters(listAnimals)} />
                     <Table />
                 </section>

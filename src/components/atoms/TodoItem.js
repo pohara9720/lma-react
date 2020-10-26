@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { loadTasks } from '../../redux/actions/tasks'
 import { displayToast } from '../../helpers/index'
 
-export const TodoItemRaw = ({ item, tasks, loadTasks }) => {
+export const TodoItemRaw = ({ item, tasks, loadTasks, onEditTask }) => {
     const { title, category, completed, id } = item
 
     const colors = {
@@ -35,7 +35,7 @@ export const TodoItemRaw = ({ item, tasks, loadTasks }) => {
                         <input disabled={completed} type="checkbox" className="checkbox-input" checked={completed} onChange={onClick} />
                         <label htmlFor="checkbox1"></label>
                     </div>
-                    <p className="todo-title mx-50 m-0 truncate">{title}</p>
+                    <a href='#' onClick={() => onEditTask(item)} className="todo-title mx-50 m-0 truncate">{title}</a>
                 </div>
                 <div className="todo-item-action d-flex align-items-center">
                     <div style={{ marginRight: 8 }}>
