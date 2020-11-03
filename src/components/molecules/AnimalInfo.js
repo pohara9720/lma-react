@@ -1,5 +1,6 @@
 import React from 'react'
 import cow from '../../app-assets/images/slider/cow.jpg'
+import logo from '../../app-assets/images/logo/logo.png'
 import { readDate } from '../../helpers/index'
 
 export const AnimalInfo = ({ animal }) => {
@@ -20,8 +21,8 @@ export const AnimalInfo = ({ animal }) => {
         <div className="col-md-4 animal-detail-profile">
             <div className="card mb-100" style={{ marginBottom: '9rem' }}>
                 <div className="card-content" style={{ backgroundColor: 'transparent', color: 'transparent' }}>
-                    <img className="card-img-top img-fluid" src={header_image} alt="Card image cap" />
-                    <img className="animal-info-p justify-content-center" src={profile_image} alt="avatar" height="180" width="180" />
+                    <img className="card-img-top img-fluid" src={header_image || logo} alt="Card image cap" />
+                    <img className="animal-info-p justify-content-center" src={profile_image || logo} alt="avatar" height="180" width="180" />
                 </div>
             </div>
             <div className="card">

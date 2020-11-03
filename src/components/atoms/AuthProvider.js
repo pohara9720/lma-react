@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { setActiveUser, listUsers } from '../../redux/actions/users'
 import { loadCompany } from '../../redux/actions/company'
@@ -6,6 +6,8 @@ import { loadInventory } from '../../redux/actions/inventory'
 import { listAnimals } from '../../redux/actions/animals'
 import { api } from '../../helpers/api'
 import { loadTasks } from '../../redux/actions/tasks'
+import { compose } from 'recompose'
+import { withRouter } from 'react-router-dom'
 
 const mapDispathToProps = dispatch => ({
     setActiveUser: (user) => dispatch(setActiveUser({ user })),
@@ -30,13 +32,16 @@ const AuthProviderRaw = ({
     loadUsers,
     ...rest
 }) => {
-
+    const [trans, setTrans] = useState()
     useEffect(() => {
         if (!activeUser) {
             const fetch = async () => {
                 try {
                     const { data } = await api.post('user/get_active_user/')
                     const { company, ...user } = data
+                    const { email } = company || {}
+                    const { data: transfer } = await api.post('transfer/check_for_transfer/', { email })
+                    setTrans(transfer)
                     setActiveUser(user)
                     loadCompany(company)
                     loadInventory({ results: company.inventory })
@@ -51,12 +56,21 @@ const AuthProviderRaw = ({
         }
     }, [activeUser])
 
+    useEffect(() => {
+        if (trans && trans.id) {
+            history.push(`/transfer/${trans.id}`)
+        }
+    }, [trans])
+
     return (
         <div>{children}</div>
     )
 }
 
-export const AuthProvider = connect(mapStateToProps, mapDispathToProps)(AuthProviderRaw)
+export const AuthProvider = compose(
+    withRouter,
+    connect(mapStateToProps, mapDispathToProps)
+)(AuthProviderRaw)
 
 export const withAuthProvider = WrappedComp => {
     return props => {

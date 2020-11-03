@@ -86,7 +86,7 @@ export const ManageUsersTabRaw = ({ loadUsers, users, history, setTaskModal, set
 
     const onDelete = async id => {
         try {
-            await api.delete(`user/${id}/`)
+            await api.post(`user/${id}/delete_single`)
             const { results, ...rest } = users || {}
             const state = results.filter((user) => user.id !== id)
             loadUsers({ ...rest, results: state })
@@ -142,6 +142,11 @@ export const ManageUsersTabRaw = ({ loadUsers, users, history, setTaskModal, set
 
     ]
 
+    const fetch = async () => {
+        const { data: init } = await api.get(`user/?page=${page}`)
+        loadUsers(init)
+    }
+
     const { toggle, Modal } = useModal()
     const { Table, page, selected } = useTable(users, columns)
 
@@ -157,19 +162,16 @@ export const ManageUsersTabRaw = ({ loadUsers, users, history, setTaskModal, set
         setTaskModal(true)
     }
 
-    const onDeleteMultiple = () => {
+    const onDeleteMultiple = async () => {
         if (!selected.length) {
             return null
         } else {
-            console.log(selected)
+            await api.post('user/batch_delete/', { users: selected })
+            fetch()
         }
     }
 
     useEffect(() => {
-        const fetch = async () => {
-            const { data: init } = await api.get(`user/?page=${page}`)
-            loadUsers(init)
-        }
         fetch()
     }, [page])
 

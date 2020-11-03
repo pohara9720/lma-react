@@ -97,11 +97,12 @@ export const AnimalsPageRaw = ({
         setTaskModal(true)
     }
 
-    const onDelete = () => {
+    const onDelete = async () => {
         if (!selected.length) {
             return null
         } else {
-            console.log(selected)
+            await api.post('animal/batch_delete/', { animals: selected })
+            fetch()
         }
     }
 
@@ -174,7 +175,7 @@ export const AnimalsPageRaw = ({
             <div className="content-body">
                 <section className="invoice-list-wrapper">
                     <PageHeaderActions title='Add Animal' onAdd={toggle} onExport='animal' onImport='animal' refetch={fetch} />
-                    <TableHeaderActions searchConfig={searchConfig} options={animalOptions(onCreateSale, onAssign, onDelete)} filters={animalFilters(listAnimals)} />
+                    <TableHeaderActions searchConfig={searchConfig} options={animalOptions(onCreateSale, onAssign, onDelete)} filters={animalFilters(listAnimals)} closeOnly />
                     <Table />
                 </section>
                 <Modal actionless title='Add Animal' onClose={onClose}>

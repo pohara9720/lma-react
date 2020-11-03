@@ -28,6 +28,7 @@ import { ForgotPasswordPage } from '../../pages/ForgotPasswordPage';
 import { ChangePasswordPage } from '../../pages/ChangePasswordPage'
 import { ResendEmailPage } from '../../pages/ResendEmailPage'
 import { LMA_AUTH_TOKEN } from '../../dictionary';
+import { TransferPage } from '../../pages/TransferPage';
 
 // const history = createBrowserHistory()
 
@@ -118,6 +119,9 @@ export const Routes = () => {
                     </Route>
                     <Route path="/change-password">
                         <ChangePasswordPage />
+                    </Route>
+                    <Route path="/transfer/:transferId">
+                        <TransferPage />
                     </Route>
                     <Route path="*">
                         <ErrorPage is404 />

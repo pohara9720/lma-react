@@ -132,12 +132,12 @@ export const invoiceFilters = (loadSales) => {
     ]
 }
 
-export const invoiceOptions = (onSend, onPaid) => {
+export const invoiceOptions = (onSend, onPaid, onDelete) => {
     return [
         { id: 'ALL_OPTIONS', label: 'Options', onClick: () => { } },
         { id: 'TO_PAID', label: 'Change Status to Paid', onClick: onPaid },
         { id: 'SEND', label: 'Send', onClick: onSend },
-        { id: 'DELETE', label: 'Delete Invoice(s)', onClick: {}, isDelete: true }
+        { id: 'DELETE', label: 'Delete Invoice(s)', onClick: onDelete, isDelete: true }
     ]
 }
 

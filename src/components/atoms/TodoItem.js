@@ -27,6 +27,12 @@ export const TodoItemRaw = ({ item, tasks, loadTasks, onEditTask }) => {
             displayToast({ error: true })
         }
     }
+
+    const onDelete = async id => {
+        await api.post(`task/${id}/delete_single/`)
+        const removed = tasks.filter(({ id: taskId }) => taskId !== id)
+        loadTasks(removed)
+    }
     return (
         <li className="todo-item task-item" data-name="David Smith">
             <div className="todo-title-wrapper d-flex justify-content-sm-between justify-content-end align-items-center">
@@ -43,7 +49,7 @@ export const TodoItemRaw = ({ item, tasks, loadTasks, onEditTask }) => {
                         <span>{category}</span>
                     </div>
                     <StatusBubble color={completed ? colors.HEALTH : colors[REPRODUCTION]} status={completed ? 'Completed' : 'Not completed'} />
-                    <a className='todo-item-delete ml-75'><i className="bx bx-trash"></i></a>
+                    <a onClick={() => onDelete(id)} className='todo-item-delete ml-75'><i className="bx bx-trash"></i></a>
                 </div>
             </div>
         </li>

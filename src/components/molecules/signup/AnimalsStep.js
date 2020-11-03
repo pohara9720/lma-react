@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import cattle from '../../../app-assets/images/slider/cow.jpg'
-import horses from '../../../app-assets/images/pages/horses.jpg'
-import pigs from '../../../app-assets/images/pages/pigs.jpg'
-import goats from '../../../app-assets/images/pages/goats.jpg'
-import sheep from '../../../app-assets/images/pages/sheep.jpg'
+import cattle from '../../../app-assets/images/ocattle.png'
+import horses from '../../../app-assets/images/ohorse.png'
+import pigs from '../../../app-assets/images/opig.png'
+import goats from '../../../app-assets/images/ogoat.png'
+import sheep from '../../../app-assets/images/osheep.png'
 
 
 export const AnimalsStep = ({ setQuantity }) => {

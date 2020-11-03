@@ -45,6 +45,12 @@ export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
             render: (({ status }) => <StatusBubble status={status} color={status === 'PAID' ? 'success' : 'danger'} />)
         },
     ]
+
+    const fetch = async () => {
+        const { data: init } = await api.get(`sale/?page=${page}`)
+        loadSales(init)
+    }
+
     const { Table, selected, page, clear } = useTable(sales, columns)
 
     const searchConfig = {
@@ -62,11 +68,21 @@ export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
         }
     }
 
+    const onDelete = async () => {
+        if (!selected.length) {
+            return null
+        } else {
+            await api.post('sale/batch_delete/', { sales: selected })
+            fetch()
+        }
+    }
+
     const onPaid = async () => {
         try {
             const invoices = compare(selected, sales?.results).filter(({ status }) => status === UNPAID)
             if (invoices.length) {
-                await api.post('sale/change_to_paid/', { invoices })
+                const ids = invoices.map(({ id }) => id)
+                await api.post('sale/change_to_paid/', { invoices: ids })
                 const { data: init } = await api.get(`sale/?page=${page}`)
                 loadSales(init)
             }
@@ -78,10 +94,6 @@ export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
     }
 
     useEffect(() => {
-        const fetch = async () => {
-            const { data: init } = await api.get(`sale/?page=${page}`)
-            loadSales(init)
-        }
         fetch()
     }, [page])
 
@@ -91,7 +103,7 @@ export const SalesPageRaw = ({ history, match, sales, loadSales }) => {
             <div className="content-body">
                 <section className="invoice-list-wrapper">
                     <PageHeaderActions title='Create Sale' onAdd={() => history.push(`${match.url}/manage-invoice`)} onExport='sale' />
-                    <TableHeaderActions searchConfig={searchConfig} options={invoiceOptions(onSend, onPaid)} filters={invoiceFilters(loadSales)} closeOnly />
+                    <TableHeaderActions searchConfig={searchConfig} options={invoiceOptions(onSend, onPaid, onDelete)} filters={invoiceFilters(loadSales)} closeOnly />
                     <Table />
                 </section>
             </div>

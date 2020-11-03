@@ -107,11 +107,12 @@ export const InventoryPageRaw = ({
         setTaskModal(true)
     }
 
-    const onDelete = () => {
+    const onDelete = async () => {
         if (!selected.length) {
             return null
         } else {
-            console.log(selected)
+            await api.post('inventory/batch_delete/', { inventory: selected })
+            fetch()
         }
     }
 
@@ -158,7 +159,7 @@ export const InventoryPageRaw = ({
             <div className="content-body">
                 <section className="invoice-list-wrapper">
                     <PageHeaderActions title='Add Inventory' onAdd={toggle} onExport='inventory' onImport='inventory' refetch={fetch} />
-                    <TableHeaderActions searchConfig={searchConfig} options={inventoryOptions(onCreateSale, onAssign, onDelete)} filters={inventoryFilters(loadInventory)} />
+                    <TableHeaderActions searchConfig={searchConfig} options={inventoryOptions(onCreateSale, onAssign, onDelete)} filters={inventoryFilters(loadInventory)} closeOnly />
                     <Table />
                 </section>
                 <Modal actionless title='Add Inventory' onClose={onClose}>

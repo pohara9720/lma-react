@@ -11,7 +11,7 @@ import {
 import { BulletLabel } from '../atoms/BulletLabel'
 import styled from 'styled-components'
 import { FEED, REPRODUCTION, BREEDING, OTHER, HEALTH, colors } from '../../dictionary'
-import { readDate } from '../../helpers/index'
+import { readDate, unique } from '../../helpers/index'
 import moment from 'moment'
 
 const Key = styled.div`
@@ -53,7 +53,19 @@ export const ProfitTab = ({ expenses, sales }) => {
         [OTHER]: 'Other',
         [HEALTH]: 'Health'
     }
-    const mappedExpenses = expenses?.map(({ task_type, cost }) => ({
+
+    let mapped = [];
+
+    expenses && expenses.reduce((res, value) => {
+        if (!res[value.task_type]) {
+            res[value.task_type] = { task_type: value.task_type, cost: 0 };
+            mapped.push(res[value.task_type])
+        }
+        res[value.task_type].cost += value.cost;
+        return res;
+    }, {});
+
+    const mappedExpenses = mapped?.map(({ task_type, cost }) => ({
         angle: cost,
         label: `${labels[task_type]}`,
         subLabel: `$${(cost / 100).toFixed(2)}`,
@@ -85,6 +97,7 @@ export const ProfitTab = ({ expenses, sales }) => {
     // const greenData = [{ x: 'A', y: 10 }, { x: 'B', y: 5 }, { x: 'C', y: 15 }];
 
     // const blueData = [{ x: 'A', y: 12 }, { x: 'B', y: 2 }, { x: 'C', y: 11 }];
+
     return (
         <div className="tab-pane pl-0" id="profitability" aria-labelledby="profitability-tab" role="tabpanel">
             <BarContainer>
@@ -92,14 +105,15 @@ export const ProfitTab = ({ expenses, sales }) => {
                     <BulletLabel label='Inventory' color='info' />
                     <BulletLabel label='Offspring' color='primary' />
                 </Key>
-                <XYPlot xType="ordinal" width={800} height={300} xDistance={100}>
-                    <VerticalGridLines />
-                    <HorizontalGridLines />
-                    <XAxis />
-                    <YAxis />
-                    <VerticalBarSeries data={lsData} stroke='#fff' fill={colors[FEED]} animation />
-                    <VerticalBarSeries data={invData} stroke='#fff' fill={colors[OTHER]} animation />
-                </XYPlot>
+                {!lsData.length && !invData.length ? <div>No Data</div> :
+                    <XYPlot xType="ordinal" width={800} height={300} xDistance={100}>
+                        <VerticalGridLines />
+                        <HorizontalGridLines />
+                        <XAxis />
+                        <YAxis />
+                        <VerticalBarSeries data={lsData} stroke='#fff' fill={colors[FEED]} animation />
+                        <VerticalBarSeries data={invData} stroke='#fff' fill={colors[OTHER]} animation />
+                    </XYPlot>}
             </BarContainer>
 
             <PieContainer>
@@ -115,7 +129,7 @@ export const ProfitTab = ({ expenses, sales }) => {
                                 showLabels
                                 animation
                             />
-                            : <div>No data</div>
+                            : <div>No Data</div>
                     }
                 </div>
                 <div>
