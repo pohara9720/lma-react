@@ -98,9 +98,9 @@ export const AddorEditTaskRaw = ({ formValues,
 }) => {
     const { category, breeding_type, task_due_date } = formValues || {}
     const isBreeding = category === BREEDING
-    const isActive = users.filter(({ is_active }) => is_active === true)
-    const userOptions = toMulti(isActive, (({ first_name, last_name }) => `${first_name} ${last_name}`))
-    const animalOptions = toMulti(animals, (({ tag_number, name }) => `${name} (Tag# ${tag_number})`))
+    const isActive = users && users.filter(({ is_active }) => is_active === true)
+    const userOptions = isActive && toMulti(isActive, (({ first_name, last_name }) => `${first_name} ${last_name}`))
+    const animalOptions = animals && toMulti(animals, (({ tag_number, name }) => `${name} (Tag# ${tag_number})`))
     const [breedingData, setBreedingData] = useState([])
     const [defaultUsers, setDefaultUsers] = useState([])
     const [defaultAnimals, setDefaultAnimals] = useState([])
@@ -172,6 +172,9 @@ export const AddorEditTaskRaw = ({ formValues,
             if (i.length) {
                 initialize({ category: BREEDING })
             }
+        }
+        else {
+            initialize({ category: FEED })
         }
         if (taskItems && taskItems.length) {
             taskItems.map(mapToForm)

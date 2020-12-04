@@ -19,10 +19,18 @@ const schema = yup.object().shape({
     registration_number: yup.number().required('Registration number is required'),
     tag_number: yup.number().required('Tag number is required'),
     breed: yup.string(),
+    father_placeholder: yup.string().test(null, 'Sire name is required', function (value) {
+        const { father } = this.parent;
+        if (!father) return value != null || value === ''
+        return true
+    }),
+    mother_placeholder: yup.string().test(null, 'Dam name is required', function (value) {
+        const { mother } = this.parent;
+        if (!mother) return value != null || value === ''
+        return true
+    }),
     father: yup.string().when('father_placeholder', { is: c => !c, then: s => s.required('Sire is required is required') }),
     mother: yup.string().when('mother_placeholder', { is: c => !c, then: s => s.required('Dam is required is required') }),
-    father_placeholder: yup.string().nullable(),
-    mother_placeholder: yup.string().nullable(),
     dob: yup.string().test(
         "dob",
         "Date of Birth must be before today",

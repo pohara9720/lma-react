@@ -16,7 +16,6 @@ const Avatar = styled.div`
     box-shadow:0 4px 8px 0 rgba(0,0,0,.12), 0 2px 4px 0 rgba(0,0,0,.08);
 `
 
-
 export const MenuRaw = ({ match, history, activeUser, company }) => {
     const { url } = match
     const [active, setActive] = useState(url)
@@ -102,9 +101,7 @@ export const MenuRaw = ({ match, history, activeUser, company }) => {
                     <ul className="nav navbar-nav flex-row">
                         <li className="nav-item mr-auto">
                             <Link className="navbar-brand" to="/animals">
-                                <div className="brand-logo">
-                                    <img src="app-assets/images/logo/logo.png" alt="" />
-                                </div>
+                                <Avatar />
                             </Link>
                         </li>
                     </ul>
