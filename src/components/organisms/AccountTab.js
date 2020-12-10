@@ -19,6 +19,8 @@ export const AccountTabRaw = ({ setActive, company }) => {
 
     const tier = info?.product?.metadata?.tier
 
+    const format = tier?.split('(').join(' (')
+
     const isMonthly = tier && tier.includes('Month')
 
     return (
@@ -36,7 +38,7 @@ export const AccountTabRaw = ({ setActive, company }) => {
                     <div className="mt-2 pb-2 d-flex justify-content-between border-bottom">
                         <span>Membership Plan</span>
                         {/* <span>5,000+ Head</span> */}
-                        <span><a href='#'>{tier}</a></span>
+                        <span>{format}</span>
                     </div>
                     <ChangeMembership itemId={itemId} isMonthly={isMonthly} />
                 </div>

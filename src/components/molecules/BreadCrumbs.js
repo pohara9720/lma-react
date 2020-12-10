@@ -1,10 +1,34 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { withRouter, Link } from 'react-router-dom'
 import { capitalize } from '../../helpers'
+import { api } from '../../helpers/api'
+
 
 export const BreadCrumbsRaw = ({ match, title }) => {
     const [string, ...links] = match.url.split('/')
-    const format = string => string.split('-').map(capitalize).join(' ')
+    const [display, setDisplay] = useState()
+
+    const fetch = async (id, animal) => {
+        const url = animal ? `animal/${id}` : `sale/${id}`
+        const { data } = await api.get(url)
+        const val = animal ? data.name : data.title
+        setDisplay(val)
+    }
+
+
+    useEffect(() => {
+        if (links.includes(('animals'))) {
+            const id = match.params.animalId
+            fetch(id, true)
+        } else if (links.includes(('sales'))) {
+            const id = match.params.invoiceId
+            fetch(id, false)
+        }
+    }, [links])
+
+    const format = string => {
+        return string.split('-').map(capitalize).join(' ')
+    }
 
     const renderCrumbs = () => links.map((link, i) => {
         const isActive = i === links.length - 1
@@ -12,9 +36,12 @@ export const BreadCrumbsRaw = ({ match, title }) => {
         // const getPath = index => links.slice(0, index).join('/') // NOTE Need to work on function for sub routes
         const activeStyle = isActive ? { color: '#5A8DEE' } : {}
         const to = isActive ? '#' : `/${link}`
+        const raw = format(link)
+        const displayName = /\d/.test(raw) ? display : raw
+        console.log(displayName)
         return (
             <li key={i} className={className}>
-                <Link style={activeStyle} to={to}>{format(link)}</Link>
+                <Link style={activeStyle} to={to}>{displayName}</Link>
             </li>
         )
     })

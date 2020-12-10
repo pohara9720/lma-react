@@ -108,7 +108,6 @@ export const ManageUsersTabRaw = ({ loadUsers, users, history, setTaskModal, set
         {
             label: 'Email',
             name: 'email',
-            render: (({ email }) => <a href='#'>{email}</a>)
         },
         {
             label: 'First Name',

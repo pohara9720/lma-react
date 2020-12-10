@@ -190,6 +190,7 @@ export const animalTypes = [
 ]
 
 const cowSubTypes = [
+    { id: '', label: '' },
     { id: COW, label: 'Cow' },
     { id: BULL, label: 'Bull' },
     { id: HEIFER, label: 'Heifer' },
@@ -197,6 +198,7 @@ const cowSubTypes = [
 ]
 
 const horseSubTypes = [
+    { id: '', label: '' },
     { id: MARE, label: 'Mare' },
     { id: STUD, label: 'Stud' },
     { id: FILLY, label: 'Filly' },
@@ -204,6 +206,7 @@ const horseSubTypes = [
 ]
 
 const pigSubTypes = [
+    { id: '', label: '' },
     { id: SOW, label: 'Sow' },
     { id: BOAR, label: 'Boar' },
     { id: GILT, label: 'Gilt' },
@@ -211,6 +214,7 @@ const pigSubTypes = [
 ]
 
 const goatSubTypes = [
+    { id: '', label: '' },
     { id: DOE, label: 'Doe' },
     { id: BUCK, label: 'Buck' },
     { id: DOELING, label: 'Doeling' },
@@ -218,6 +222,7 @@ const goatSubTypes = [
 ]
 
 const sheepSubTypes = [
+    { id: '', label: '' },
     { id: EWE, label: 'Ewe' },
     { id: RAM, label: 'Ram' },
     { id: EWE_LAMB, label: 'Ewe Lamb' },

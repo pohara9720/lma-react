@@ -13,7 +13,7 @@ const Avatar = styled.div`
     background-image: ${`url(${image})`};
     background-repeat: no-repeat;
     border-radius:50%;
-    box-shadow:0 4px 8px 0 rgba(0,0,0,.12), 0 2px 4px 0 rgba(0,0,0,.08);
+    box-shadow: ${props => props.noShadow ? 0 : "0 4px 8px 0 rgba(0,0,0,.12), 0 2px 4px 0 rgba(0,0,0,.08)"};
 `
 
 export const MenuRaw = ({ match, history, activeUser, company }) => {
@@ -101,7 +101,7 @@ export const MenuRaw = ({ match, history, activeUser, company }) => {
                     <ul className="nav navbar-nav flex-row">
                         <li className="nav-item mr-auto">
                             <Link className="navbar-brand" to="/animals">
-                                <Avatar />
+                                <Avatar noShadow />
                             </Link>
                         </li>
                     </ul>

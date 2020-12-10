@@ -11,7 +11,7 @@ const localizer = momentLocalizer(moment)
 export const mapForCalendar = data => {
 
     return data.map(({ task_due_date, title, category, ...rest }) =>
-        ({ title, start: task_due_date, end: task_due_date, color: colors[category], category, ...rest }))
+        ({ title, start: moment(task_due_date).toDate(), end: moment(task_due_date).toDate(), color: colors[category], category, ...rest }))
 }
 
 const Calendar = ({ tasks, onEditTask }) =>
@@ -23,7 +23,7 @@ const Calendar = ({ tasks, onEditTask }) =>
         style={{ height: 500 }}
         selectable={false}
         onDrillDown={() => { }}
-        onSelectEvent={item => item.completed ? null : onEditTask({ task_due_date: item.start, ...item })}
+        onSelectEvent={item => item.completed ? null : onEditTask({ task_due_date: moment(item.start).format(), ...item })}
         popup
         eventPropGetter={event => ({ style: { backgroundColor: event.color } })}
     />
@@ -43,7 +43,7 @@ const TodoList = ({ tasks, ...rest }) => {
     )
 }
 
-export const Todos = ({ tasks, ...rest }) => {
+export const Todos = ({ tasks, onChange, value, ...rest }) => {
     return (
         <div className="content-right">
             <div className="content-wrapper">
@@ -59,7 +59,7 @@ export const Todos = ({ tasks, ...rest }) => {
                                         <i className="bx bx-menu"></i>
                                     </div>
                                     <fieldset className="form-group position-relative has-icon-left m-0 flex-grow-1">
-                                        <input type="text" className="form-control todo-search" id="todo-search" placeholder="Search Task" />
+                                        <input onChange={onChange} value={value} type="text" className="form-control todo-search" id="todo-search" placeholder="Search Task" />
                                         <div className="form-control-position">
                                             <i className="bx bx-search"></i>
                                         </div>

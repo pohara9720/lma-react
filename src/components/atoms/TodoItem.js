@@ -33,6 +33,9 @@ export const TodoItemRaw = ({ item, tasks, loadTasks, onEditTask }) => {
         const removed = tasks.filter(({ id: taskId }) => taskId !== id)
         loadTasks(removed)
     }
+
+    const onEdit = completed ? () => console.log('Uneditable') : () => onEditTask(item)
+
     return (
         <li className="todo-item task-item" data-name="David Smith">
             <div className="todo-title-wrapper d-flex justify-content-sm-between justify-content-end align-items-center">
@@ -41,7 +44,7 @@ export const TodoItemRaw = ({ item, tasks, loadTasks, onEditTask }) => {
                         <input disabled={completed} type="checkbox" className="checkbox-input" checked={completed} onChange={onClick} />
                         <label htmlFor="checkbox1"></label>
                     </div>
-                    <a href='#' onClick={() => onEditTask(item)} className="todo-title mx-50 m-0 truncate">{title}</a>
+                    <a href='#' onClick={onEdit} className="todo-title mx-50 m-0 truncate">{title}</a>
                 </div>
                 <div className="todo-item-action d-flex align-items-center">
                     <div style={{ marginRight: 8 }}>

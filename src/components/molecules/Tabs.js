@@ -4,7 +4,7 @@ import { ADMIN_ROLE } from '../../dictionary'
 export const Tabs = ({ active, setActive, tabs, role }) => {
     const isAdmin = role === ADMIN_ROLE
     const ListItem = ({ title, icon, adminOnly }) => !adminOnly || (adminOnly && isAdmin) ? (
-        <li className={`nav-item ${title === active ? 'current' : ''}`}>
+        <li style={{ cursor: 'pointer' }} className={`nav-item ${title === active ? 'current' : ''}`}>
             <div onClick={() => setActive(title)} className={`nav-link d-flex align-items-center ${active === title ? 'active' : ''}`}>
                 <i className={icon}></i><span className="d-none d-sm-block">{title}</span>
             </div>

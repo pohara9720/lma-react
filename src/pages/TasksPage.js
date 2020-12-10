@@ -11,6 +11,7 @@ import { api } from '../helpers/api'
 import { displayToast, price } from '../helpers/index'
 import { FEED, REPRODUCTION, BREEDING, OTHER, HEALTH } from '../dictionary'
 import { PageWrapper } from '../components/atoms/PageWrapper'
+import { useSearch } from '../hooks/useSearch'
 
 export const TasksPageRaw = ({
     tasks,
@@ -23,6 +24,7 @@ export const TasksPageRaw = ({
     const { toggle, Modal } = useModal(taskModalOpen)
     const [active, setActive] = useState('All Tasks')
     const [filtered, setFiltered] = useState(tasks)
+    const { onChange, value } = useSearch('task', loadTasks)
 
     useEffect(() => {
         const value = () => {
@@ -120,7 +122,7 @@ export const TasksPageRaw = ({
                     <PageHeaderActions title='New Task' onAdd={toggle} />
                     <div className='tasks-container-p'>
                         <TodoSidebar active={active} onClick={onFilterClick} />
-                        <Todos onEditTask={onEditTask} tasks={filtered} />
+                        <Todos onEditTask={onEditTask} tasks={filtered} onChange={onChange} value={value} />
                     </div>
                 </section>
                 <Modal actionless title='New Task' onClose={onClose}>
