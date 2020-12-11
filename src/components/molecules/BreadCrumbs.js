@@ -17,12 +17,14 @@ export const BreadCrumbsRaw = ({ match, title }) => {
 
 
     useEffect(() => {
-        if (links.includes(('animals'))) {
-            const id = match.params.animalId
-            fetch(id, true)
-        } else if (links.includes(('sales'))) {
-            const id = match.params.invoiceId
-            fetch(id, false)
+        if (links.some(x => x.includes('-'))) {
+            if (links.includes(('animals'))) {
+                const id = match.params.animalId
+                fetch(id, true)
+            } else if (links.includes(('sales'))) {
+                const id = match.params.invoiceId
+                fetch(id, false)
+            }
         }
     }, [links])
 
